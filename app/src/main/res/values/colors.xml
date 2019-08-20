@@ -6,4 +6,11 @@
     <color name="purple">#8565c4</color>
     <color name="purpleLight">#cec1e7</color>
     <color name="black">#000000</color>
+    <color name="lightCyan">#DDFFF7</color>
+    <color name="paleRobinEggBlue">#93E1D8</color>
+    <color name="lightSalmonPink">#FFA69E</color>
+    <color name="mediumRuby">#AA4465</color>
+    <color name="frenchPlum">#861657</color>
+    <color name="red">#ff6961</color>
+    <color name="green">#61ff69</color>
 </resources>
