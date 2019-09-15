@@ -9,18 +9,24 @@ import androidx.fragment.app.DialogFragment;
 import android.content.Context;
 import android.media.Image;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.penwallet.roldechill.Entities.Creature;
+import com.penwallet.roldechill.Entities.Status;
 import com.penwallet.roldechill.Utilities.Utils;
 import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolder> {
@@ -46,12 +52,13 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
         holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
         holder.maxHealth.setText(Integer.toString(mItemList.get(position).getVidaMaxima()));
         holder.iniciativa.setText(Integer.toString(mItemList.get(position).getIniciativa()));
         holder.name.setText(mItemList.get(position).getNombre());
+        holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
 
         //Darle foto a la imagen
         if(mItemList.get(position).isEsJugador())
@@ -59,13 +66,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             if(mItemList.get(position).getNombre().toLowerCase().equals("oscar"))
                 holder.image.setImageResource(R.drawable.oscar);
             else if(mItemList.get(position).getNombre().toLowerCase().equals("miguel"))
-            {
-                int pifia = new Random().nextInt(20)+1;
-                if(pifia == 1)
-                    holder.image.setImageResource(R.drawable.pifia);
-                else
-                    holder.image.setImageResource(R.drawable.miguel);
-            }
+                holder.image.setImageResource(R.drawable.miguel);
             else if(mItemList.get(position).getNombre().toLowerCase().equals("fran"))
                 holder.image.setImageResource(R.drawable.fran);
             else if(mItemList.get(position).getNombre().toLowerCase().equals("olga"))
@@ -75,6 +76,13 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
         }
         else
             holder.image.setImageResource(R.drawable.creature);
+
+        //Cargar el Spinner
+        String[] estados = Arrays.toString(Status.values()).replaceAll("^.|.$", "").split(", ");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.spinnertext, estados);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        holder.spinner.setAdapter(adapter);
+        holder.spinner.setSelection(mItemList.get(position).getEstado().ordinal());
 
         holder.addHealth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +94,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
                     Utils.animateClick(v);
                     mItemList.get(position).cambiarVida(1);
 
-                    notifyDataSetChanged();
+                    holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
                 }
             }
         });
@@ -97,9 +105,10 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
 
                 if(mItemList.get(position).getVida() == 1 && !mItemList.get(position).isEsJugador())
                     mItemList.remove(position);
-                else if(mItemList.get(position).getVida() == 0)
+                else if(mItemList.get(position).getVida() <= 0)
                 {
                     Utils.animateError(v);
+                    return;
                 }
                 else
                 {
@@ -107,7 +116,38 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
                     mItemList.get(position).cambiarVida(-1);
                 }
 
-                notifyDataSetChanged();
+                holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
+            }
+        });
+
+        holder.addPifia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mItemList.get(position).getPifias() >= 99)
+                    Utils.animateError(v);
+                else
+                {
+                    Utils.animateClick(v);
+                    mItemList.get(position).cambiarPifia(1);
+
+                    holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
+                }
+            }
+        });
+
+        holder.subtractPifia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mItemList.get(position).getPifias() <= 0)
+                    Utils.animateError(v);
+                else
+                {
+                    Utils.animateClick(v);
+                    mItemList.get(position).cambiarPifia(-1);
+
+                    holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
+                }
             }
         });
 
@@ -116,6 +156,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             public void onClick(View v) {
                 if(mItemList.size() > 0)
                 {
+                    Utils.animateClick(v);
                     mItemList.remove(position);
                     notifyDataSetChanged();
                 }
@@ -131,6 +172,30 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
                 popup.show(((AppCompatActivity)context).getSupportFragmentManager(), "popupEdit");
             }
         });
+
+        holder.spinner.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                holder.userInteraction = true;
+                return false;
+            }
+        });
+
+        holder.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int positionSpinner, long id) {
+                if(holder.userInteraction)
+                {
+                    Database.creatures.get(position).setEstado(Status.values()[positionSpinner]);
+                    holder.userInteraction = false;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -139,9 +204,11 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
     }
 
     class ViewHolder extends DragItemAdapter.ViewHolder {
-        TextView health, maxHealth, iniciativa, name;
-        CardView addHealth, subtractHealth, whole;
-        ImageView image, close;
+        TextView health, maxHealth, iniciativa, name, pifias;
+        CardView whole;
+        ImageView image, close, addHealth, subtractHealth, addPifia, subtractPifia;
+        Spinner spinner;
+        boolean userInteraction;
 
         public ViewHolder(final View itemView) {
             super(itemView, mGrabHandleId, mDragOnLongPress);
@@ -152,8 +219,13 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             name = itemView.findViewById(R.id.txtName);
             addHealth = itemView.findViewById(R.id.addHealth);
             subtractHealth = itemView.findViewById(R.id.substractHealth);
+            addPifia = itemView.findViewById(R.id.addPifia);
+            subtractPifia = itemView.findViewById(R.id.substractPifia);
             image = itemView.findViewById(R.id.imgCharacter);
             close = itemView.findViewById(R.id.closeCharacter);
+            pifias = itemView.findViewById(R.id.txtPifias);
+            spinner = itemView.findViewById(R.id.statusSpinner);
+            userInteraction = false;
         }
     }
 }

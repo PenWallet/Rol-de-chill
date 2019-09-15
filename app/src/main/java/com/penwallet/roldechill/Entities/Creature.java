@@ -6,6 +6,7 @@ public class Creature {
     private int vida, vidaMaxima, iniciativa, id;
     private boolean esJugador;
     private Status estado;
+    private int pifias;
 
     public Creature()
     {
@@ -16,9 +17,10 @@ public class Creature {
         this.iniciativa = 1;
         this.esJugador = false;
         this.estado = Status.NORMAL;
+        this.pifias = 0;
     }
 
-    public Creature(String nombre, int vida, int vidaMaxima, int iniciativa, boolean esJugador, Status estado)
+    public Creature(String nombre, int vida, int vidaMaxima, int iniciativa, boolean esJugador, Status estado, int pifias)
     {
         this.id = idGenerator++;
         this.nombre = nombre;
@@ -27,6 +29,7 @@ public class Creature {
         this.iniciativa = iniciativa;
         this.esJugador = esJugador;
         this.estado = estado;
+        this.pifias = pifias;
     }
 
     public int getId() {
@@ -81,8 +84,21 @@ public class Creature {
         this.estado = estado;
     }
 
+    public int getPifias() {
+        return pifias;
+    }
+
+    public void setPifias(int pifias) {
+        this.pifias = pifias;
+    }
+
     public void cambiarVida(int vidaASumarORestar)
     {
         this.vida += vidaASumarORestar;
+    }
+
+    public void cambiarPifia(int pifiaASumarORestar)
+    {
+        this.pifias += pifiaASumarORestar;
     }
 }

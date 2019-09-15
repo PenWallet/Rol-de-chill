@@ -11,51 +11,122 @@
         android:scaleType="center"
         android:gravity="center"
         android:autoSizeTextType="uniform"
-        android:background="#FFFFBB33"
+        android:textColor="@color/white"
+        android:background="#121212"
         android:contentDescription="@string/app_name"/>
-    <EditText
-        android:id="@+id/createNombre"
-        android:inputType="textEmailAddress"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:hint="Nombre" />
-    <EditText
-        android:id="@+id/createIniciativa"
-        android:inputType="number"
+        android:orientation="horizontal"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4sp"
+            android:layout_marginEnd="4sp"/>
+        <EditText
+            android:id="@+id/createNombre"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:maxLength="20"
+            android:hint="Nombre" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:fontFamily="sans-serif"
-        android:hint="Iniciativa"/>
-    <EditText
-        android:id="@+id/createVidaMaxima"
-        android:inputType="number"
+        android:orientation="horizontal"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Iniciativa"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4sp"
+            android:layout_marginEnd="4sp"/>
+        <EditText
+            android:id="@+id/createIniciativa"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif"
+            android:maxLength="3"
+            android:hint="Iniciativa"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:fontFamily="sans-serif"
-        android:hint="Vida máxima"/>
-    <EditText
-        android:id="@+id/createVidaActual"
-        android:inputType="number"
+        android:orientation="horizontal"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vida máxima"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4sp"
+            android:layout_marginEnd="4sp"/>
+        <EditText
+            android:id="@+id/createVidaMaxima"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif"
+            android:maxLength="4"
+            android:hint="Vida máxima"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:fontFamily="sans-serif"
-        android:hint="Vida actual"/>
+        android:orientation="horizontal"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vida actual"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4sp"
+            android:layout_marginEnd="4sp"/>
+        <EditText
+            android:id="@+id/createVidaActual"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif"
+            android:maxLength="4"
+            android:hint="Vida actual"/>
+    </LinearLayout>
+
     <CheckBox
         android:id="@+id/createEsJugador"
         android:layout_width="match_parent"
@@ -66,6 +137,7 @@
         android:layout_marginBottom="4dp"
         android:fontFamily="sans-serif"
         android:hint="¿Es un jugador?"/>
+
     <Spinner
         android:id="@+id/createEstado"
         android:layout_width="match_parent"
@@ -75,4 +147,35 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
         android:fontFamily="sans-serif"/>
+
+    <LinearLayout
+        android:id="@+id/createCopiasLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copias"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4sp"
+            android:layout_marginEnd="4sp"/>
+        <EditText
+            android:id="@+id/createCopias"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif"
+            android:maxLength="2"
+            android:text="1"
+            android:hint="Copias"/>
+    </LinearLayout>
 </LinearLayout>
