@@ -106,12 +106,12 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(Database.creatures); // myObject - instance of MyObject
+        String json = gson.toJson(Database.creatures);
         prefsEditor.putString(Constants.CREATURES_SHAREDPREFERENCES_NAME, json);
         prefsEditor.apply();
     }
 
-    //Ordenar por iniciativa. Si ambas iniciativas son iguales, entonces se ordena por el nombre.
+    //Ordenar por iniciativa
     public void orderByIniciativa(View view) {
         Utils.animateClick(view);
         Collections.sort(Database.creatures, new Comparator<Creature>() {
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 else if(o1.getIniciativa() > o2.getIniciativa())
                     return -1;
                 else
-                    return o1.getNombre().compareTo(o2.getNombre());
+                    return 0;
             }
         });
 

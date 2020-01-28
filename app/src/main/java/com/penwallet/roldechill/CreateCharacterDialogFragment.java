@@ -90,6 +90,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
                     view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
                     view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
+                    ((EditText)view.findViewById(R.id.createDanoRecibido)).setText("0");
                 }
             }
         });
@@ -106,6 +107,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
+            ((EditText)view.findViewById(R.id.createCopias)).setText("1");
         }
         else
         {
@@ -113,6 +115,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
+            ((EditText)view.findViewById(R.id.createDanoRecibido)).setText("0");
         }
 
         return builder.create();

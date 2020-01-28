@@ -5,11 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,10 +24,8 @@ import com.penwallet.roldechill.Entities.Status;
 import com.penwallet.roldechill.Utilities.Utils;
 import com.woxthebox.draglistview.DragItemAdapter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolder> {
 
@@ -72,7 +68,9 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             else if(mItemList.get(position).getNombre().toLowerCase().equals("fran"))
                 holder.image.setImageResource(R.drawable.fran);
             else if(mItemList.get(position).getNombre().toLowerCase().equals("olga"))
-                holder.image.setImageResource(R.drawable.olga2);
+                holder.image.setImageResource(R.drawable.olga);
+            else if(mItemList.get(position).getNombre().toLowerCase().equals("triana"))
+                holder.image.setImageResource(R.drawable.triana);
             else
                 holder.image.setImageResource(R.drawable.player);
         }
@@ -91,11 +89,19 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
         {
             holder.slash.setVisibility(View.VISIBLE);
             holder.maxHealth.setVisibility(View.VISIBLE);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(holder.cLayout);
+            constraintSet.connect(R.id.txtHealth,ConstraintSet.END,R.id.txtSlash,ConstraintSet.END,0);
+            constraintSet.applyTo(holder.cLayout);
         }
         else
         {
             holder.slash.setVisibility(View.GONE);
             holder.maxHealth.setVisibility(View.GONE);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(holder.cLayout);
+            constraintSet.connect(R.id.txtHealth,ConstraintSet.END,R.id.guideline20,ConstraintSet.END,0);
+            constraintSet.applyTo(holder.cLayout);
         }
 
         holder.addHealth.setOnClickListener(new View.OnClickListener() {
@@ -127,22 +133,15 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             @Override
             public void onClick(View v) {
 
-                if(mItemList.get(position).getVida() <= 0)
-                {
-                    Utils.animateError(v);
-                    return;
-                }
-                else if(mItemList.get(position).isEsJugador() && mItemList.get(position).getVida() == 1)
-                {
-                    mItemList.remove(position);
-                }
-                else
+                if(mItemList.get(position).getVida() > 0)
                 {
                     Utils.animateClick(v);
                     mItemList.get(position).cambiarVida(-1);
+                    holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
                 }
+                else //Si la vida no es mayor que 0, no se puede restar
+                    Utils.animateError(v);
 
-                holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
             }
         });
 
@@ -150,7 +149,10 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             @Override
             public void onClick(View v) {
                 if(mItemList.get(position).getPifias() >= 99)
+                {
                     Utils.animateError(v);
+                    Toast.makeText(context, "¿Cómo pollas has pifiado tanto, "+mItemList.get(position).getNombre()+"? WTF", Toast.LENGTH_SHORT).show();
+                }
                 else
                 {
                     Utils.animateClick(v);
