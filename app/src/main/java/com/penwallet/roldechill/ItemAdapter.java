@@ -3,6 +3,8 @@ package com.penwallet.roldechill;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
@@ -84,11 +86,33 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
         holder.spinner.setAdapter(adapter);
         holder.spinner.setSelection(mItemList.get(position).getEstado().ordinal());
 
+        //Si es un enemigo, la vida máxima se expande para ser el daño recibido
+        if(mItemList.get(position).isEsJugador())
+        {
+            holder.slash.setVisibility(View.VISIBLE);
+            holder.maxHealth.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.slash.setVisibility(View.GONE);
+            holder.maxHealth.setVisibility(View.GONE);
+        }
+
         holder.addHealth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mItemList.get(position).getVida() >= mItemList.get(position).getVidaMaxima())
-                    Utils.animateError(v);
+                if(mItemList.get(position).isEsJugador())
+                {
+                    if(mItemList.get(position).getVida() >= mItemList.get(position).getVidaMaxima())
+                        Utils.animateError(v);
+                    else
+                    {
+                        Utils.animateClick(v);
+                        mItemList.get(position).cambiarVida(1);
+
+                        holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
+                    }
+                }
                 else
                 {
                     Utils.animateClick(v);
@@ -103,12 +127,14 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             @Override
             public void onClick(View v) {
 
-                if(mItemList.get(position).getVida() == 1 && !mItemList.get(position).isEsJugador())
-                    mItemList.remove(position);
-                else if(mItemList.get(position).getVida() <= 0)
+                if(mItemList.get(position).getVida() <= 0)
                 {
                     Utils.animateError(v);
                     return;
+                }
+                else if(mItemList.get(position).isEsJugador() && mItemList.get(position).getVida() == 1)
+                {
+                    mItemList.remove(position);
                 }
                 else
                 {
@@ -204,7 +230,8 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
     }
 
     class ViewHolder extends DragItemAdapter.ViewHolder {
-        TextView health, maxHealth, iniciativa, name, pifias;
+        ConstraintLayout cLayout;
+        TextView health, maxHealth, iniciativa, name, pifias, slash;
         CardView whole;
         ImageView image, close, addHealth, subtractHealth, addPifia, subtractPifia;
         Spinner spinner;
@@ -213,7 +240,9 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
         public ViewHolder(final View itemView) {
             super(itemView, mGrabHandleId, mDragOnLongPress);
             whole = itemView.findViewById(R.id.cardViewCharacter);
+            cLayout = itemView.findViewById(R.id.char_layout_constraint_layout);
             health = itemView.findViewById(R.id.txtHealth);
+            slash = itemView.findViewById(R.id.txtSlash);
             maxHealth = itemView.findViewById(R.id.txtMaxHealth);
             iniciativa = itemView.findViewById(R.id.txtIniciativa);
             name = itemView.findViewById(R.id.txtName);

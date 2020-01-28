@@ -3,7 +3,7 @@ package com.penwallet.roldechill.Entities;
 public class Creature {
     private static int idGenerator = 0;
     private String nombre;
-    private int vida, vidaMaxima, iniciativa, id;
+    private int vida, vidaMaxima, iniciativa, id; //La vida servirá como daño recibido si es un bicho
     private boolean esJugador;
     private Status estado;
     private int pifias;

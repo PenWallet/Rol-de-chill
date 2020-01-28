@@ -75,13 +75,22 @@ public class CreateCharacterDialogFragment extends DialogFragment {
         cEsJugador.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Si es un jugador, desaparece el botón de añadir copias,si no, vuelve a aparecer
                 if(isChecked)
                 {
                     view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.GONE);
+                    view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.GONE);
+                    view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.VISIBLE);
                     ((EditText)view.findViewById(R.id.createCopias)).setText("1");
                 }
                 else
+                {
                     view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
+                    view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
+                }
             }
         });
 
@@ -91,9 +100,20 @@ public class CreateCharacterDialogFragment extends DialogFragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        //Volver visible el linear layout de copias, ya que por defecto cuando se pulsa en Añadir
-        //se va a crear a un bicho
-        view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
+        if(cEsJugador.isChecked())
+        {
+            view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
+            view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
+        }
+        else
+        {
+            view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
+            view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
+        }
 
         return builder.create();
     }
@@ -107,7 +127,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
             d.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EditText eNombre, eIniciativa, eVidaActual, eVidaMaxima, eCopias;
+                    EditText eNombre, eIniciativa, eVidaActual, eVidaMaxima, eCopias, eDanoRecibido;
                     CheckBox cEsJugador;
                     Spinner sEstado;
                     String nombre;
@@ -122,15 +142,15 @@ public class CreateCharacterDialogFragment extends DialogFragment {
                     cEsJugador = view.findViewById(R.id.createEsJugador);
                     eCopias = view.findViewById(R.id.createCopias);
                     sEstado = view.findViewById(R.id.createEstado);
+                    eDanoRecibido = view.findViewById(R.id.createDanoRecibido);
 
                     nombre = eNombre.getText().toString();
                     iniciativa = eIniciativa.getText().toString().equals("") ? 0 : Integer.valueOf(eIniciativa.getText().toString());
-                    vidaActual = eVidaActual.getText().toString().equals("") ? 0 : Integer.valueOf(eVidaActual.getText().toString());
-                    vidaMaxima = eVidaMaxima.getText().toString().equals("") ? 0 : Integer.valueOf(eVidaMaxima.getText().toString());
                     esJugador = cEsJugador.isChecked();
+                    vidaActual = esJugador ? (eVidaActual.getText().toString().equals("") ? 0 : Integer.valueOf(eVidaActual.getText().toString())) : ((eDanoRecibido.getText().toString().equals("") ? 0 : Integer.valueOf(eDanoRecibido.getText().toString())));
+                    vidaMaxima = eVidaMaxima.getText().toString().equals("") ? 0 : Integer.valueOf(eVidaMaxima.getText().toString());
                     copias = eCopias.getText().toString().equals("") ? 0 : Integer.valueOf(eCopias.getText().toString());
                     estado = Status.valueOf((String)sEstado.getSelectedItem());
-
 
                     //Comprobar datos
                     if(nombre.isEmpty())
@@ -151,31 +171,44 @@ public class CreateCharacterDialogFragment extends DialogFragment {
                     else
                         eIniciativa.getBackground().clearColorFilter();
 
-                    if(vidaActual < 0 || (vidaActual == 0 && !esJugador))
+                    if(esJugador)
                     {
-                        eVidaActual.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-                        Toast.makeText(getContext(), "La vida actual no puede ser menor o igual a 0", Toast.LENGTH_SHORT).show();
-                        okay = false;
-                    }
-                    else if(vidaActual > vidaMaxima)
-                    {
-                        eVidaActual.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-                        Toast.makeText(getContext(), "La vida actual no puede ser mayor a la vida máxima", Toast.LENGTH_SHORT).show();
-                        okay = false;
+                        if(vidaMaxima <= 0)
+                        {
+                            eVidaMaxima.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                            Toast.makeText(getContext(), "La vida máxima no puede ser menor o igual a 0", Toast.LENGTH_SHORT).show();
+                            okay = false;
+                        }
+                        else
+                            eVidaMaxima.getBackground().clearColorFilter();
+
+                        if(vidaActual < 0)
+                        {
+                            eVidaActual.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                            Toast.makeText(getContext(), "La vida actual no puede ser menor o igual a 0", Toast.LENGTH_SHORT).show();
+                            okay = false;
+                        }
+                        else if(vidaActual > vidaMaxima)
+                        {
+                            eVidaActual.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                            Toast.makeText(getContext(), "La vida actual no puede ser mayor a la vida máxima", Toast.LENGTH_SHORT).show();
+                            okay = false;
+                        }
+                        else
+                            eVidaActual.getBackground().clearColorFilter();
                     }
                     else
-                        eVidaActual.getBackground().clearColorFilter();
-
-                    if(vidaMaxima <= 0)
                     {
-                        eVidaMaxima.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-                        Toast.makeText(getContext(), "La vida máxima no puede ser menor o igual a 0", Toast.LENGTH_SHORT).show();
-                        okay = false;
+                        //Recuerda que la vida máxima es el daño recibido en los mostros
+                        if(vidaActual < 0)
+                        {
+                            eDanoRecibido.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                            Toast.makeText(getContext(), "El daño recibido no puede ser menor a 0", Toast.LENGTH_SHORT).show();
+                            okay = false;
+                        }
+                        else
+                            eDanoRecibido.getBackground().clearColorFilter();
                     }
-                    else
-                        eVidaMaxima.getBackground().clearColorFilter();
-
-
 
                     if(copias <= 0)
                     {

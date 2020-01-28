@@ -68,23 +68,25 @@ public class MainActivity extends AppCompatActivity {
             Type type = new TypeToken<ArrayList<Creature>>(){}.getType();
             ArrayList<Creature> creaturesList = new Gson().fromJson(creaturesJson, type);
 
-            //Si no hay ninguna criatura, metemos a los 3 tontos de siempre por defecto
+            //Si no hay ninguna criatura, metemos a los 4 tontos de siempre por defecto
             if(creaturesList.size() == 0)
             {
                 //Metemos a Miguel, Olga y a mi por defecto
                 Database.creatures.add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
                 Database.creatures.add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
                 Database.creatures.add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
+                Database.creatures.add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
             }
             else
                 Database.creatures = creaturesList;
         }
         else
         {
-            //Si no hay ninguna criatura, metemos a los 3 tontos de siempre por defecto
+            //Si no hay ninguna criatura, metemos a los 4 tontos de siempre por defecto
             Database.creatures.add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
             Database.creatures.add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
             Database.creatures.add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
+            Database.creatures.add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
         }
 
         Database.listView = findViewById(R.id.dragList);
