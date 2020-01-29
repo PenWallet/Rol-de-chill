@@ -106,12 +106,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Database.listView.getAdapter().notifyDataSetChanged();
+        viewModel.getPerformListRefresh().setValue(true);
     }
 
     public void addCreature(View view) {
         Utils.animateClick(view);
         DialogFragment popup = new CreateCharacterDialogFragment();
         popup.show(getSupportFragmentManager(), "popup");
+    }
+
+    public void changeToDrawingFragment(View view) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, drawingFragment).addToBackStack(null).commit();
     }
 }

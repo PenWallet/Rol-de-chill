@@ -217,7 +217,7 @@ public class EditCharacterDialogFragment extends DialogFragment {
                         viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setIniciativa(iniciativa);
                         viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEsJugador(esJugador);
                         viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEstado(estado);
-                        Database.listView.getAdapter().notifyDataSetChanged();
+                        viewModel.getPerformListRefresh().setValue(true);
                         dismiss();
                     }
                 }

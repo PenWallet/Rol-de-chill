@@ -235,7 +235,8 @@ public class CreateCharacterDialogFragment extends DialogFragment {
                             for(int i = 1; i <= copias; i++)
                                 viewModel.getCreatures().getValue().add(new Creature(nombre+" "+i, vidaActual, vidaMaxima, iniciativa, false, estado, 0));
                         }
-                        Database.listView.getAdapter().notifyDataSetChanged();
+
+                        viewModel.getPerformListRefresh().setValue(true);
                         dismiss();
                     }
                 }

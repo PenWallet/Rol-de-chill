@@ -17,9 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Utilities.Utils;
+import com.woxthebox.draglistview.DragListView;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,7 +51,9 @@ public class ListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        ImageView cv = getActivity().findViewById(R.id.btnAddCreature);
+        ImageView cv = requireActivity().findViewById(R.id.btnAddCreature);
+        DragListView listView = requireActivity().findViewById(R.id.dragList);
+
         cv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -59,7 +63,7 @@ public class ListFragment extends Fragment {
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         viewModel.getCreatures().getValue().clear();
-                        Database.listView.getAdapter().notifyDataSetChanged();
+                        viewModel.getPerformListRefresh().setValue(true);
                     }
                 });
 
@@ -71,23 +75,30 @@ public class ListFragment extends Fragment {
             }
         });
 
-        Database.listView = getActivity().findViewById(R.id.dragList);
-
-        Database.listView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        listView.setLayoutManager(new LinearLayoutManager(requireContext()));
         ItemAdapter listAdapter = new ItemAdapter(viewModel.getCreatures().getValue(), R.layout.character_layout, R.id.cardViewCharacter, true, requireContext(), viewModel);
-        Database.listView.setAdapter(listAdapter, false);
-        Database.listView.setCanDragHorizontally(false);
-        Database.listView.setCustomDragItem(null);
+        listView.setAdapter(listAdapter, false);
+        listView.setCanDragHorizontally(false);
+        listView.setCustomDragItem(null);
 
         //Observer para la posición elegida para abrir el popup de editar
         final Observer<Integer> selectedCreatureObserver = new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 DialogFragment popup = new EditCharacterDialogFragment();
-                popup.show(((AppCompatActivity)getContext()).getSupportFragmentManager(), "popupEdit");
+                popup.show(((AppCompatActivity)requireContext()).getSupportFragmentManager(), "popupEdit");
+            }
+        };
+
+        //Observer para refrescar la lista
+        final Observer<Boolean> refreshList = new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean bool) {
+                ((DragListView)requireActivity().findViewById(R.id.dragList)).getAdapter().notifyDataSetChanged();
             }
         };
 
         viewModel.getSelectedCreature().observe(getViewLifecycleOwner(), selectedCreatureObserver);
+        viewModel.getPerformListRefresh().observe(getViewLifecycleOwner(), refreshList);
     }
 }

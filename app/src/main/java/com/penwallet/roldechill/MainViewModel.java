@@ -11,11 +11,13 @@ import java.util.ArrayList;
 public class MainViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Creature>> creatures;
     private MutableLiveData<Integer> selectedCreature;
+    private MutableLiveData<Boolean> performListRefresh; //Used only to observe and refresh the list
 
     public MainViewModel()
     {
         creatures = new MutableLiveData<>();
         selectedCreature = new MutableLiveData<>();
+        performListRefresh = new MutableLiveData<>();
 
         creatures.setValue(new ArrayList<Creature>());
     }
@@ -26,6 +28,10 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<Integer> getSelectedCreature() {
         return selectedCreature;
+    }
+
+    public MutableLiveData<Boolean> getPerformListRefresh() {
+        return performListRefresh;
     }
 
     public void setCreatures(MutableLiveData<ArrayList<Creature>> creatures) {
