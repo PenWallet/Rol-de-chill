@@ -17,7 +17,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 
 public class EditCharacterDialogFragment extends DialogFragment {
     private View view;
+    private MainViewModel viewModel;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -53,6 +56,9 @@ public class EditCharacterDialogFragment extends DialogFragment {
                 })
                 .setCancelable(true);
 
+        //Cargar el viewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+
         //Cambiar título de cabecera
         ((TextView)view.findViewById(R.id.createTitle)).setText("EDITAR");
 
@@ -64,7 +70,7 @@ public class EditCharacterDialogFragment extends DialogFragment {
         spinner.setAdapter(adapter);
 
         //Darle los valores que ya sabemos
-        Creature c = Database.creatures.get(Database.selectedCreature);
+        Creature c = viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue());
         ((EditText)view.findViewById(R.id.createNombre)).setText(c.getNombre());
         ((EditText)view.findViewById(R.id.createIniciativa)).setText(Integer.toString(c.getIniciativa()));
         ((EditText)view.findViewById(R.id.createVidaMaxima)).setText(Integer.toString(c.getVidaMaxima()));
@@ -205,12 +211,12 @@ public class EditCharacterDialogFragment extends DialogFragment {
 
                     if(okay)
                     {
-                        Database.creatures.get(Database.selectedCreature).setNombre(nombre);
-                        Database.creatures.get(Database.selectedCreature).setVida(vidaActual);
-                        Database.creatures.get(Database.selectedCreature).setVidaMaxima(vidaMaxima);
-                        Database.creatures.get(Database.selectedCreature).setIniciativa(iniciativa);
-                        Database.creatures.get(Database.selectedCreature).setEsJugador(esJugador);
-                        Database.creatures.get(Database.selectedCreature).setEstado(estado);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setNombre(nombre);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setVida(vidaActual);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setVidaMaxima(vidaMaxima);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setIniciativa(iniciativa);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEsJugador(esJugador);
+                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEstado(estado);
                         Database.listView.getAdapter().notifyDataSetChanged();
                         dismiss();
                     }

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
@@ -32,33 +33,15 @@ import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MainViewModel viewModel;
+    ListFragment listFragment;
+    DrawingFragment drawingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ImageView cv = findViewById(R.id.btnAddCreature);
-        cv.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle("¿Borrar todas las criaturas?");
-
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Database.creatures.clear();
-                        Database.listView.getAdapter().notifyDataSetChanged();
-                    }
-                });
-
-                alertDialog.setCancelable(true);
-
-                alertDialog.show();
-
-                return true;
-            }
-        });
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         //Cogemos los datos del SharedPreferences si existen
         SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -72,30 +55,26 @@ public class MainActivity extends AppCompatActivity {
             if(creaturesList.size() == 0)
             {
                 //Metemos a Miguel, Olga y a mi por defecto
-                Database.creatures.add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
-                Database.creatures.add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
-                Database.creatures.add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
-                Database.creatures.add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
             }
             else
-                Database.creatures = creaturesList;
+                viewModel.getCreatures().setValue(creaturesList);
         }
         else
         {
             //Si no hay ninguna criatura, metemos a los 4 tontos de siempre por defecto
-            Database.creatures.add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
-            Database.creatures.add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
-            Database.creatures.add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
-            Database.creatures.add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
         }
 
-        Database.listView = findViewById(R.id.dragList);
-
-        Database.listView.setLayoutManager(new LinearLayoutManager(this));
-        ItemAdapter listAdapter = new ItemAdapter(Database.creatures, R.layout.character_layout, R.id.cardViewCharacter, true, this);
-        Database.listView.setAdapter(listAdapter, false);
-        Database.listView.setCanDragHorizontally(false);
-        Database.listView.setCustomDragItem(null);
+        listFragment = new ListFragment();
+        drawingFragment = new DrawingFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, listFragment).commit();
     }
 
     @Override
@@ -106,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(Database.creatures);
+        String json = gson.toJson(viewModel.getCreatures().getValue());
         prefsEditor.putString(Constants.CREATURES_SHAREDPREFERENCES_NAME, json);
         prefsEditor.apply();
     }
@@ -114,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     //Ordenar por iniciativa
     public void orderByIniciativa(View view) {
         Utils.animateClick(view);
-        Collections.sort(Database.creatures, new Comparator<Creature>() {
+        Collections.sort(viewModel.getCreatures().getValue(), new Comparator<Creature>() {
             @Override
             public int compare(Creature o1, Creature o2)
             {

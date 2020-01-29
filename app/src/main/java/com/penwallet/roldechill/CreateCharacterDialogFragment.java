@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 
 public class CreateCharacterDialogFragment extends DialogFragment {
     private View view;
+    private MainViewModel viewModel;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
         // Pass null as the parent view because its going in the dialog layout
         final View view = inflater.inflate(R.layout.create_character_popup, null);
         this.view = view;
+        this.viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         ((EditText)view.findViewById(R.id.createVidaMaxima)).addTextChangedListener(new TextWatcher() {
             @Override
@@ -226,11 +229,11 @@ public class CreateCharacterDialogFragment extends DialogFragment {
                     if(okay)
                     {
                         if(esJugador || copias == 1)
-                            Database.creatures.add(new Creature(nombre, vidaActual, vidaMaxima, iniciativa, esJugador, estado, 0));
+                            viewModel.getCreatures().getValue().add(new Creature(nombre, vidaActual, vidaMaxima, iniciativa, esJugador, estado, 0));
                         else
                         {
                             for(int i = 1; i <= copias; i++)
-                                Database.creatures.add(new Creature(nombre+" "+i, vidaActual, vidaMaxima, iniciativa, false, estado, 0));
+                                viewModel.getCreatures().getValue().add(new Creature(nombre+" "+i, vidaActual, vidaMaxima, iniciativa, false, estado, 0));
                         }
                         Database.listView.getAdapter().notifyDataSetChanged();
                         dismiss();

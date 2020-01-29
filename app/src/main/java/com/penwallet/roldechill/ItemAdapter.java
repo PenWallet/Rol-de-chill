@@ -33,12 +33,14 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
     private int mGrabHandleId;
     private boolean mDragOnLongPress;
     private Context context;
+    private MainViewModel viewModel;
 
-    public ItemAdapter(ArrayList<Creature> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context) {
+    public ItemAdapter(ArrayList<Creature> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context, MainViewModel mainViewModel) {
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
         mDragOnLongPress = dragOnLongPress;
         this.context = context;
+        this.viewModel = mainViewModel;
         setItemList(list);
     }
 
@@ -195,9 +197,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
         holder.whole.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Database.selectedCreature = position;
-                DialogFragment popup = new EditCharacterDialogFragment();
-                popup.show(((AppCompatActivity)context).getSupportFragmentManager(), "popupEdit");
+                viewModel.getSelectedCreature().setValue(position);
             }
         });
 
@@ -214,7 +214,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
             public void onItemSelected(AdapterView<?> parent, View view, int positionSpinner, long id) {
                 if(holder.userInteraction)
                 {
-                    Database.creatures.get(position).setEstado(Status.values()[positionSpinner]);
+                    viewModel.getCreatures().getValue().get(position).setEstado(Status.values()[positionSpinner]);
                     holder.userInteraction = false;
                 }
             }
