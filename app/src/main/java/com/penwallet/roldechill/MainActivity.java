@@ -4,17 +4,22 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     ListFragment listFragment;
     DrawingFragment drawingFragment;
+    DrawingToolsFragment drawingToolsFragment;
+    FrameLayout toolsFrame;
+    FrameLayout mainFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +82,12 @@ public class MainActivity extends AppCompatActivity {
 
         listFragment = new ListFragment();
         drawingFragment = new DrawingFragment();
+        drawingToolsFragment = new DrawingToolsFragment();
+        toolsFrame = findViewById(R.id.drawingToolsFrame);
+        mainFrame = findViewById(R.id.mainFrame);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, listFragment).commit();
+
+
     }
 
     @Override
@@ -116,6 +129,63 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeToDrawingFragment(View view) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, drawingFragment).addToBackStack(null).commit();
+        Utils.animateClick(view);
+
+        //Cambios de fragmentos
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.mainFrame, drawingFragment);
+        ft.replace(R.id.drawingToolsFrame, drawingToolsFragment);
+        ft.addToBackStack("Drawing");
+        ft.commit();
+
+        //Cambios de weight en el linear layout
+        LinearLayout.LayoutParams toolsFrameParams = (LinearLayout.LayoutParams)toolsFrame.getLayoutParams();
+        LinearLayout.LayoutParams mainFrameParams = (LinearLayout.LayoutParams)mainFrame.getLayoutParams();
+
+        toolsFrameParams.weight = 1.3f;
+        mainFrameParams.weight = 8.7f;
+
+        mainFrame.setLayoutParams(mainFrameParams);
+        toolsFrame.setLayoutParams(toolsFrameParams);
+    }
+
+    public void choosePencil(View view) {
+        viewModel.getIsPencilSelected().setValue(true);
+        Utils.animateClick(view);
+    }
+
+    public void chooseEraser(View view) {
+        viewModel.getIsPencilSelected().setValue(false);
+        Utils.animateClick(view);
+    }
+
+    public void undoLastAction(View view) {
+        viewModel.getUndoLastAction().setValue(true);
+        Utils.animateClick(view);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (count == 0)
+
+            super.onBackPressed();
+        else
+        {
+            getSupportFragmentManager().popBackStack();
+
+            //Cambios de weight en el linear layout
+            LinearLayout.LayoutParams toolsFrameParams = (LinearLayout.LayoutParams)toolsFrame.getLayoutParams();
+            LinearLayout.LayoutParams mainFrameParams = (LinearLayout.LayoutParams)mainFrame.getLayoutParams();
+
+            toolsFrameParams.weight = 0f;
+            mainFrameParams.weight = 10f;
+
+            mainFrame.setLayoutParams(mainFrameParams);
+            toolsFrame.setLayoutParams(toolsFrameParams);
+        }
     }
 }

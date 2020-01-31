@@ -42,6 +42,7 @@ public class CreateCharacterDialogFragment extends DialogFragment {
         this.view = view;
         this.viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
+        //Listener para cambiar la vida a la vez que se cambia la vida máxima
         ((EditText)view.findViewById(R.id.createVidaMaxima)).addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

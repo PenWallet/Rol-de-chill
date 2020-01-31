@@ -2,6 +2,7 @@ package com.penwallet.roldechill;
 
 
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Utilities.Utils;

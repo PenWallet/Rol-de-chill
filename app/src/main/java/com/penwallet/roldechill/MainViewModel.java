@@ -13,11 +13,20 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<Integer> selectedCreature;
     private MutableLiveData<Boolean> performListRefresh; //Used only to observe and refresh the list
 
+    //Atributos para drawing
+    private MutableLiveData<Boolean> isPencilSelected;
+    private MutableLiveData<Float> strokeWidth;
+    private MutableLiveData<Boolean> undoLastAction;
+
     public MainViewModel()
     {
         creatures = new MutableLiveData<>();
         selectedCreature = new MutableLiveData<>();
         performListRefresh = new MutableLiveData<>();
+
+        isPencilSelected = new MutableLiveData<>(); isPencilSelected.setValue(true);
+        strokeWidth = new MutableLiveData<>(); strokeWidth.setValue(5f);
+        undoLastAction = new MutableLiveData<>();
 
         creatures.setValue(new ArrayList<Creature>());
     }
@@ -34,11 +43,15 @@ public class MainViewModel extends ViewModel {
         return performListRefresh;
     }
 
-    public void setCreatures(MutableLiveData<ArrayList<Creature>> creatures) {
-        this.creatures = creatures;
+    public MutableLiveData<Boolean> getIsPencilSelected() {
+        return isPencilSelected;
     }
 
-    public void setSelectedCreature(MutableLiveData<Integer> selectedCreature) {
-        this.selectedCreature = selectedCreature;
+    public MutableLiveData<Float> getStrokeWidth() {
+        return strokeWidth;
+    }
+
+    public MutableLiveData<Boolean> getUndoLastAction() {
+        return undoLastAction;
     }
 }
