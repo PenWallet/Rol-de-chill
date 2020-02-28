@@ -1,11 +1,9 @@
-package com.penwallet.roldechill;
+package com.penwallet.roldechill.Adapters;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.fragment.app.DialogFragment;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -21,13 +19,15 @@ import android.widget.Toast;
 
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
+import com.penwallet.roldechill.MainViewModel;
+import com.penwallet.roldechill.R;
 import com.penwallet.roldechill.Utilities.Utils;
 import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolder> {
+public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesListAdapter.ViewHolder> {
 
     private int mLayoutId;
     private int mGrabHandleId;
@@ -35,7 +35,7 @@ public class ItemAdapter extends DragItemAdapter<Creature, ItemAdapter.ViewHolde
     private Context context;
     private MainViewModel viewModel;
 
-    public ItemAdapter(ArrayList<Creature> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context, MainViewModel mainViewModel) {
+    public CreaturesListAdapter(ArrayList<Creature> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context, MainViewModel mainViewModel) {
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
         mDragOnLongPress = dragOnLongPress;

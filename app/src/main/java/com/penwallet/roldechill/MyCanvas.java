@@ -21,7 +21,6 @@ import java.util.Map;
 public class MyCanvas extends View {
     float width;
     private ArrayList<Pair<Path, Paint>> paths;
-    private ArrayList<Pair<Path, Paint>> pathsInProgress;
     private Path pathInUse;
     private Paint paintInUse;
     boolean isPencil;
@@ -32,7 +31,6 @@ public class MyCanvas extends View {
         this.isPencil = isPencil;
 
         paths = new ArrayList<>();
-        pathsInProgress = new ArrayList<>();
     }
 
     @Override
@@ -42,9 +40,9 @@ public class MyCanvas extends View {
         {
             canvas.drawPath(path.first, path.second);
         }
-        for(Pair<Path, Paint> path : pathsInProgress)
+        if(pathInUse != null && paintInUse != null)
         {
-            canvas.drawPath(path.first, path.second);
+            canvas.drawPath(pathInUse, paintInUse);
         }
     }
 
@@ -70,12 +68,12 @@ public class MyCanvas extends View {
 
             case MotionEvent.ACTION_MOVE:
                 pathInUse.lineTo(xPos, yPos);
-                pathsInProgress.add(new Pair<>(pathInUse, paintInUse));
                 break;
 
             case MotionEvent.ACTION_UP:
-                pathsInProgress.clear();
                 paths.add(new Pair<>(pathInUse, paintInUse));
+                pathInUse = null;
+                paintInUse = null;
                 break;
 
             default:
@@ -107,5 +105,11 @@ public class MyCanvas extends View {
             paths.remove(paths.size()-1);
             invalidate();
         }
+    }
+
+    public void clearCanvas()
+    {
+        paths.clear();
+        invalidate();
     }
 }

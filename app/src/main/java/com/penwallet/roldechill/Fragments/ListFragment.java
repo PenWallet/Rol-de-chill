@@ -1,8 +1,7 @@
-package com.penwallet.roldechill;
+package com.penwallet.roldechill.Fragments;
 
 
 import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -18,15 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import com.penwallet.roldechill.Entities.Creature;
-import com.penwallet.roldechill.Utilities.Utils;
+import com.penwallet.roldechill.Adapters.CreaturesListAdapter;
+import com.penwallet.roldechill.MainViewModel;
+import com.penwallet.roldechill.R;
 import com.woxthebox.draglistview.DragListView;
-
-import java.util.Collections;
-import java.util.Comparator;
 
 
 /**
@@ -78,7 +73,7 @@ public class ListFragment extends Fragment {
         });
 
         listView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        ItemAdapter listAdapter = new ItemAdapter(viewModel.getCreatures().getValue(), R.layout.character_layout, R.id.cardViewCharacter, true, requireContext(), viewModel);
+        CreaturesListAdapter listAdapter = new CreaturesListAdapter(viewModel.getCreatures().getValue(), R.layout.character_layout, R.id.cardViewCharacter, true, requireContext(), viewModel);
         listView.setAdapter(listAdapter, false);
         listView.setCanDragHorizontally(false);
         listView.setCustomDragItem(null);

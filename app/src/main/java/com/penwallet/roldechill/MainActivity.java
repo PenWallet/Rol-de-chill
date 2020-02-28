@@ -1,35 +1,28 @@
 package com.penwallet.roldechill;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.penwallet.roldechill.Constants.SharedPreferencesConstants;
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
+import com.penwallet.roldechill.Fragments.CreateCharacterDialogFragment;
+import com.penwallet.roldechill.Fragments.DrawingFragment;
+import com.penwallet.roldechill.Fragments.DrawingToolsFragment;
+import com.penwallet.roldechill.Fragments.ListFragment;
 import com.penwallet.roldechill.Utilities.Utils;
-import com.woxthebox.draglistview.DragItemAdapter;
-import com.woxthebox.draglistview.DragListView;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -52,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         //Cogemos los datos del SharedPreferences si existen
-        SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
-        String creaturesJson = preferences.getString(Constants.CREATURES_SHAREDPREFERENCES_NAME, null);
+        SharedPreferences preferences = this.getSharedPreferences(SharedPreferencesConstants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
+        String creaturesJson = preferences.getString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, null);
         if(creaturesJson != null)
         {
             Type type = new TypeToken<ArrayList<Creature>>(){}.getType();
@@ -95,11 +88,11 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
 
         //Guardar a SharedPreferences
-        SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = this.getSharedPreferences(SharedPreferencesConstants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(viewModel.getCreatures().getValue());
-        prefsEditor.putString(Constants.CREATURES_SHAREDPREFERENCES_NAME, json);
+        prefsEditor.putString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, json);
         prefsEditor.apply();
     }
 
@@ -171,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         int count = getSupportFragmentManager().getBackStackEntryCount();
 
         if (count == 0)
-
             super.onBackPressed();
         else
         {

@@ -75,7 +75,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:max="5"
-        android:progress="1"
         android:minHeight="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline23"

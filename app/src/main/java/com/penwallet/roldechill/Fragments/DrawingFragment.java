@@ -1,4 +1,4 @@
-package com.penwallet.roldechill;
+package com.penwallet.roldechill.Fragments;
 
 
 import android.os.Bundle;
@@ -12,6 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import com.penwallet.roldechill.MainViewModel;
+import com.penwallet.roldechill.MyCanvas;
+import com.penwallet.roldechill.R;
 
 
 /**
@@ -63,6 +67,13 @@ public class DrawingFragment extends Fragment {
             }
         };
 
+        final Observer<Boolean> clearCanvasObserver = new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isPencil) {
+                myCanvas.clearCanvas();
+            }
+        };
+
         final Observer<Boolean> undoLastAction = new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean undo) {
@@ -73,5 +84,6 @@ public class DrawingFragment extends Fragment {
         viewModel.getStrokeWidth().observe(getViewLifecycleOwner(), strokeWidthObserver);
         viewModel.getIsPencilSelected().observe(getViewLifecycleOwner(), isPencilObserver);
         viewModel.getUndoLastAction().observe(getViewLifecycleOwner(), undoLastAction);
+        viewModel.getClearCanvas().observe(getViewLifecycleOwner(), clearCanvasObserver);
     }
 }
