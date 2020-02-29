@@ -14,14 +14,17 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.penwallet.roldechill.Constants.SharedPreferencesConstants;
+import com.penwallet.roldechill.Entities.Ally;
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
 import com.penwallet.roldechill.Fragments.CreateCharacterDialogFragment;
 import com.penwallet.roldechill.Fragments.DrawingFragment;
 import com.penwallet.roldechill.Fragments.DrawingToolsFragment;
 import com.penwallet.roldechill.Fragments.ListFragment;
+import com.penwallet.roldechill.Utilities.JsonDeserializerWithInheritance;
 import com.penwallet.roldechill.Utilities.Utils;
 
 import java.lang.reflect.Type;
@@ -49,28 +52,32 @@ public class MainActivity extends AppCompatActivity {
         String creaturesJson = preferences.getString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, null);
         if(creaturesJson != null)
         {
+            Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
             Type type = new TypeToken<ArrayList<Creature>>(){}.getType();
-            ArrayList<Creature> creaturesList = new Gson().fromJson(creaturesJson, type);
 
-            //Si no hay ninguna criatura, metemos a los 4 tontos de siempre por defecto
+            ArrayList<Creature> creaturesList = gson.fromJson(creaturesJson, type);
+
+            //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto
             if(creaturesList.size() == 0)
             {
                 //Metemos a Miguel, Olga y a mi por defecto
-                viewModel.getCreatures().getValue().add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
+                viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
             }
             else
                 viewModel.getCreatures().setValue(creaturesList);
         }
         else
         {
-            //Si no hay ninguna criatura, metemos a los 4 tontos de siempre por defecto
-            viewModel.getCreatures().getValue().add(new Creature("Oscar", 1, 1, 0, true, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Creature("Miguel", 1, 1, 0, true, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Creature("Olga", 1, 1, 0, true, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Creature("Triana", 1, 1, 0, true, Status.NORMAL, 0));
+            //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto
+            viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
+            viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
         }
 
         listFragment = new ListFragment();
@@ -90,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         //Guardar a SharedPreferences
         SharedPreferences preferences = this.getSharedPreferences(SharedPreferencesConstants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
         String json = gson.toJson(viewModel.getCreatures().getValue());
         prefsEditor.putString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, json);
         prefsEditor.apply();

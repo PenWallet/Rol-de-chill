@@ -1,5 +1,9 @@
 package com.penwallet.roldechill;
 
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.Pair;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,6 +18,7 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<Integer> selectedCreature;
     private MutableLiveData<Boolean> performListRefresh; //Used only to observe and refresh the list
     private MutableLiveData<Boolean> clearCanvas; //Used only to observe when user wants to clear the canvas
+    private ArrayList<Pair<Path, Paint>> drawnPaths;
 
     //Atributos para drawing
     private MutableLiveData<Boolean> isPencilSelected;
@@ -27,6 +32,7 @@ public class MainViewModel extends ViewModel {
         performListRefresh = new MutableLiveData<>();
         clearCanvas = new MutableLiveData<>();
         undoLastAction = new MutableLiveData<>();
+        drawnPaths = new ArrayList<>();
 
         isPencilSelected = new MutableLiveData<>(); isPencilSelected.setValue(true);
         strokeWidth = new MutableLiveData<>(); strokeWidth.setValue(ToolsConstants.MINIMUM_STROKE_WIDTH);
@@ -60,5 +66,13 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> getClearCanvas() {
         return clearCanvas;
+    }
+
+    public ArrayList<Pair<Path, Paint>> getDrawnPaths() {
+        return drawnPaths;
+    }
+
+    public void setDrawnPaths(ArrayList<Pair<Path, Paint>> drawnPaths) {
+        this.drawnPaths = drawnPaths;
     }
 }

@@ -19,7 +19,9 @@ import android.widget.Toast;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.penwallet.roldechill.Entities.Ally;
 import com.penwallet.roldechill.Entities.Creature;
+import com.penwallet.roldechill.Entities.Enemy;
 import com.penwallet.roldechill.Entities.Status;
 import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
@@ -51,10 +53,13 @@ public class EditCharacterDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        EditCharacterDialogFragment.this.getDialog().cancel();
+                        //Se vuelve a poner a null para solucionar bug:
+                        //Si se ha elegido un personaje para Editar, se entra en dibujo, y se sale, se abría de nuevo la ventana de Editar
+                        viewModel.getSelectedCreature().setValue(null);
+                        dialog.cancel();
                     }
                 })
-                .setCancelable(true);
+                .setCancelable(false);
 
         //Cargar el viewModel
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
@@ -73,14 +78,17 @@ public class EditCharacterDialogFragment extends DialogFragment {
         Creature c = viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue());
         ((EditText)view.findViewById(R.id.createNombre)).setText(c.getNombre());
         ((EditText)view.findViewById(R.id.createIniciativa)).setText(Integer.toString(c.getIniciativa()));
-        ((EditText)view.findViewById(R.id.createVidaMaxima)).setText(Integer.toString(c.getVidaMaxima()));
-        ((EditText)view.findViewById(R.id.createVidaActual)).setText(c.isEsJugador() ? Integer.toString(c.getVida()) : "0");
-        ((EditText)view.findViewById(R.id.createDanoRecibido)).setText(!c.isEsJugador() ? Integer.toString(c.getVida()) : "0");
-        ((CheckBox)view.findViewById(R.id.createEsJugador)).setChecked(c.isEsJugador());
         ((Spinner)view.findViewById(R.id.createEstado)).setSelection(c.getEstado().ordinal());
 
-        if(c.isEsJugador())
+        if(c instanceof Ally)
         {
+            Ally ally = (Ally)c;
+            ((EditText)view.findViewById(R.id.createVidaMaxima)).setText(Integer.toString(ally.getVidaMaxima()));
+            ((EditText)view.findViewById(R.id.createVidaActual)).setText(Integer.toString(ally.getVidaActual()));
+            ((EditText)view.findViewById(R.id.createDanoRecibido)).setText("0");
+            ((CheckBox)view.findViewById(R.id.createEsJugador)).setChecked(true);
+
+            //Visibilidad de las vistas
             view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.VISIBLE);
@@ -88,6 +96,13 @@ public class EditCharacterDialogFragment extends DialogFragment {
         }
         else
         {
+            Enemy enemy = (Enemy)c;
+            ((EditText)view.findViewById(R.id.createVidaMaxima)).setText("");
+            ((EditText)view.findViewById(R.id.createVidaActual)).setText("");
+            ((EditText)view.findViewById(R.id.createDanoRecibido)).setText(Integer.toString(enemy.getDanoRecibido()));
+            ((CheckBox)view.findViewById(R.id.createEsJugador)).setChecked(false);
+
+            //Visibilidad de las vistas
             view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
@@ -211,12 +226,42 @@ public class EditCharacterDialogFragment extends DialogFragment {
 
                     if(okay)
                     {
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setNombre(nombre);
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setVida(vidaActual);
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setVidaMaxima(vidaMaxima);
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setIniciativa(iniciativa);
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEsJugador(esJugador);
-                        viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue()).setEstado(estado);
+                        Creature creature = viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue());
+
+                        //Ahora depende de si ha cambiado de Ally a Enemy; de Enemy a Ally, o si ha cambiado los datos de un Ally o de un Enemy
+                        if(creature instanceof Ally)
+                        {
+                            Ally ally = (Ally)creature;
+
+                            //Si sigue siendo un Ally (no va a cambiar a Enemy)
+                            if(esJugador)
+                            {
+                                ally.setNombre(nombre);
+                                ally.setVidaActual(vidaActual);
+                                ally.setVidaMaxima(vidaMaxima);
+                                ally.setIniciativa(iniciativa);
+                                ally.setEstado(estado);
+                            }
+                            else //Si va a cambiar a ser un Enemy
+                                viewModel.getCreatures().getValue().set(viewModel.getSelectedCreature().getValue(), new Enemy(nombre, vidaActual, iniciativa, estado, ally.getPifias()));
+                        }
+                        else
+                        {
+                            Enemy enemy = (Enemy)creature;
+
+                            //Si sigue siendo un Enemy (no va a cambiar a Ally)
+                            if(!esJugador)
+                            {
+                                enemy.setNombre(nombre);
+                                enemy.setDanoRecibido(vidaActual);
+                                enemy.setIniciativa(iniciativa);
+                                enemy.setEstado(estado);
+                            }
+                            else //Si va a cambiar a ser un Ally
+                                viewModel.getCreatures().getValue().set(viewModel.getSelectedCreature().getValue(), new Ally(nombre, vidaActual, vidaMaxima, iniciativa, estado, enemy.getPifias()));
+                        }
+
+                        //Refrescar la lista al terminar de actualizar los datos de la criatura
                         viewModel.getPerformListRefresh().setValue(true);
                         dismiss();
                     }

@@ -5,6 +5,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,8 +18,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.penwallet.roldechill.Entities.Ally;
 import com.penwallet.roldechill.Entities.Creature;
+import com.penwallet.roldechill.Entities.Enemy;
 import com.penwallet.roldechill.Entities.Status;
+import com.penwallet.roldechill.Listeners.RepeatListener;
 import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
 import com.penwallet.roldechill.Utilities.Utils;
@@ -51,18 +55,20 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         return new ViewHolder(view);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
-        holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
-        holder.maxHealth.setText(Integer.toString(mItemList.get(position).getVidaMaxima()));
-        holder.iniciativa.setText(Integer.toString(mItemList.get(position).getIniciativa()));
-        holder.name.setText(mItemList.get(position).getNombre());
-        holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
 
-        //Darle foto a la imagen
-        if(mItemList.get(position).isEsJugador())
+        if(mItemList.get(position) instanceof Ally)
         {
+            Ally ally = (Ally)mItemList.get(position);
+
+            //Le damos el texto a la vida actual y máxima
+            holder.health.setText(Integer.toString(ally.getVidaActual()));
+            holder.maxHealth.setText(Integer.toString(ally.getVidaMaxima()));
+
+            //En caso de ser uno de nosotros, cambiar la imagen
             if(mItemList.get(position).getNombre().toLowerCase().equals("oscar"))
                 holder.image.setImageResource(R.drawable.oscar);
             else if(mItemList.get(position).getNombre().toLowerCase().equals("miguel"))
@@ -75,20 +81,8 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
                 holder.image.setImageResource(R.drawable.triana);
             else
                 holder.image.setImageResource(R.drawable.player);
-        }
-        else
-            holder.image.setImageResource(R.drawable.creature);
 
-        //Cargar el Spinner
-        String[] estados = Arrays.toString(Status.values()).replaceAll("^.|.$", "").split(", ");
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.spinnertext, estados);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        holder.spinner.setAdapter(adapter);
-        holder.spinner.setSelection(mItemList.get(position).getEstado().ordinal());
-
-        //Si es un enemigo, la vida máxima se expande para ser el daño recibido
-        if(mItemList.get(position).isEsJugador())
-        {
+            //Si es un aliado, la vida actual y máxima vuelven a las posiciones iniciales y vuelven a ser visibles
             holder.slash.setVisibility(View.VISIBLE);
             holder.maxHealth.setVisibility(View.VISIBLE);
             ConstraintSet constraintSet = new ConstraintSet();
@@ -98,6 +92,15 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         }
         else
         {
+            Enemy enemy = (Enemy)mItemList.get(position);
+
+            //La "vida" se cambia al daño recibido del eneimgo
+            holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
+
+            //La imagen se cambia a la de una criatura
+            holder.image.setImageResource(R.drawable.creature);
+
+            //Si es un enemigo, el daño recibido queda centrado bajo la imagen
             holder.slash.setVisibility(View.GONE);
             holder.maxHealth.setVisibility(View.GONE);
             ConstraintSet constraintSet = new ConstraintSet();
@@ -106,48 +109,80 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             constraintSet.applyTo(holder.cLayout);
         }
 
-        holder.addHealth.setOnClickListener(new View.OnClickListener() {
+        holder.iniciativa.setText(Integer.toString(mItemList.get(position).getIniciativa()));
+        holder.name.setText(mItemList.get(position).getNombre());
+        holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
+
+        //Cargar el Spinner
+        String[] estados = Arrays.toString(Status.values()).replaceAll("^.|.$", "").split(", ");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.spinnertext, estados);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        holder.spinner.setAdapter(adapter);
+        holder.spinner.setSelection(mItemList.get(position).getEstado().ordinal());
+
+
+        holder.addHealth.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mItemList.get(position).isEsJugador())
+                if(mItemList.get(position) instanceof Ally)
                 {
-                    if(mItemList.get(position).getVida() >= mItemList.get(position).getVidaMaxima())
+                    Ally ally = (Ally)mItemList.get(position);
+                    if(ally.getVidaActual() >= ally.getVidaMaxima())
                         Utils.animateError(v);
                     else
                     {
                         Utils.animateClick(v);
-                        mItemList.get(position).cambiarVida(1);
+                        ally.cambiarVida(1);
 
-                        holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
+                        holder.health.setText(Integer.toString(ally.getVidaActual()));
                     }
                 }
                 else
                 {
-                    Utils.animateClick(v);
-                    mItemList.get(position).cambiarVida(1);
+                    Enemy enemy = (Enemy)mItemList.get(position);
 
-                    holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
+                    Utils.animateClick(v);
+                    enemy.cambiarDanoRecibido(1);
+
+                    holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
                 }
             }
-        });
+        }));
 
-        holder.subtractHealth.setOnClickListener(new View.OnClickListener() {
+        holder.subtractHealth.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(mItemList.get(position).getVida() > 0)
+                //Si es un aliado
+                if(mItemList.get(position) instanceof Ally)
                 {
-                    Utils.animateClick(v);
-                    mItemList.get(position).cambiarVida(-1);
-                    holder.health.setText(Integer.toString(mItemList.get(position).getVida()));
+                    Ally ally = (Ally)mItemList.get(position);
+                    if(ally.getVidaActual() > 0) //Si su vida no es 0, puede bajarle la vida
+                    {
+                        Utils.animateClick(v);
+                        ally.cambiarVida(-1);
+                        holder.health.setText(Integer.toString(ally.getVidaActual()));
+                    }
+                    else //Si no, no
+                        Utils.animateError(v);
                 }
-                else //Si la vida no es mayor que 0, no se puede restar
-                    Utils.animateError(v);
+                else
+                {
+                    Enemy enemy = (Enemy)mItemList.get(position);
+                    if(enemy.getDanoRecibido() > 0)
+                    {
+                        Utils.animateClick(v);
+                        enemy.cambiarDanoRecibido(-1);
+                        holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
+                    }
+                    else
+                        Utils.animateError(v);
+                }
 
             }
-        });
+        }));
 
-        holder.addPifia.setOnClickListener(new View.OnClickListener() {
+        holder.addPifia.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mItemList.get(position).getPifias() >= 99)
@@ -163,9 +198,9 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
                     holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
                 }
             }
-        });
+        }));
 
-        holder.subtractPifia.setOnClickListener(new View.OnClickListener() {
+        holder.subtractPifia.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -179,7 +214,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
                     holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
                 }
             }
-        });
+        }));
 
         holder.close.setOnClickListener(new View.OnClickListener() {
             @Override

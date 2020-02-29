@@ -20,7 +20,9 @@ import android.widget.Toast;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.penwallet.roldechill.Entities.Ally;
 import com.penwallet.roldechill.Entities.Creature;
+import com.penwallet.roldechill.Entities.Enemy;
 import com.penwallet.roldechill.Entities.Status;
 import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
@@ -230,12 +232,18 @@ public class CreateCharacterDialogFragment extends DialogFragment {
 
                     if(okay)
                     {
-                        if(esJugador || copias == 1)
-                            viewModel.getCreatures().getValue().add(new Creature(nombre, vidaActual, vidaMaxima, iniciativa, esJugador, estado, 0));
+                        if(esJugador)
+                            viewModel.getCreatures().getValue().add(new Ally(nombre, vidaActual, vidaMaxima, iniciativa, estado, 0));
                         else
                         {
-                            for(int i = 1; i <= copias; i++)
-                                viewModel.getCreatures().getValue().add(new Creature(nombre+" "+i, vidaActual, vidaMaxima, iniciativa, false, estado, 0));
+                            if(copias == 1)
+                                viewModel.getCreatures().getValue().add(new Enemy(nombre, vidaActual, iniciativa, estado, 0));
+                            else
+                            {
+                                for(int i = 1; i <= copias; i++)
+                                    viewModel.getCreatures().getValue().add(new Enemy(nombre+" "+i, vidaActual, iniciativa, estado, 0));
+
+                            }
                         }
 
                         viewModel.getPerformListRefresh().setValue(true);

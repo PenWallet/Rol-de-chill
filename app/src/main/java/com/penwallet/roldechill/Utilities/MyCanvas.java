@@ -1,4 +1,4 @@
-package com.penwallet.roldechill;
+package com.penwallet.roldechill.Utilities;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -25,12 +25,12 @@ public class MyCanvas extends View {
     private Paint paintInUse;
     boolean isPencil;
 
-    public MyCanvas(Context context, float width, boolean isPencil) {
+    public MyCanvas(Context context, float width, boolean isPencil, ArrayList<Pair<Path, Paint>> paths) {
         super(context);
         this.width = width;
         this.isPencil = isPencil;
 
-        paths = new ArrayList<>();
+        this.paths = paths;
     }
 
     @Override
@@ -111,5 +111,9 @@ public class MyCanvas extends View {
     {
         paths.clear();
         invalidate();
+    }
+
+    public ArrayList<Pair<Path, Paint>> getPaths() {
+        return paths;
     }
 }

@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.penwallet.roldechill.MainViewModel;
-import com.penwallet.roldechill.MyCanvas;
+import com.penwallet.roldechill.Utilities.MyCanvas;
 import com.penwallet.roldechill.R;
 
 
@@ -45,7 +45,7 @@ public class DrawingFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getIsPencilSelected().getValue());
+        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getIsPencilSelected().getValue(), viewModel.getDrawnPaths());
 
         relativeLayout = requireActivity().findViewById(R.id.drawingLayout);
         relativeLayout.addView(myCanvas);
@@ -85,5 +85,12 @@ public class DrawingFragment extends Fragment {
         viewModel.getIsPencilSelected().observe(getViewLifecycleOwner(), isPencilObserver);
         viewModel.getUndoLastAction().observe(getViewLifecycleOwner(), undoLastAction);
         viewModel.getClearCanvas().observe(getViewLifecycleOwner(), clearCanvasObserver);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        viewModel.setDrawnPaths(myCanvas.getPaths());
     }
 }

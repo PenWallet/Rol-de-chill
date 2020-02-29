@@ -82,8 +82,12 @@ public class ListFragment extends Fragment {
         final Observer<Integer> selectedCreatureObserver = new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                DialogFragment popup = new EditCharacterDialogFragment();
-                popup.show(((AppCompatActivity)requireContext()).getSupportFragmentManager(), "popupEdit");
+                if(integer != null)
+                {
+                    DialogFragment popup = new EditCharacterDialogFragment();
+                    popup.setCancelable(false);
+                    popup.show(((AppCompatActivity)requireContext()).getSupportFragmentManager(), "popupEdit");
+                }
             }
         };
 
