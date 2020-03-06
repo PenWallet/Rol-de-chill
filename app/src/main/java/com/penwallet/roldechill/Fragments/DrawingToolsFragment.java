@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +34,20 @@ public class DrawingToolsFragment extends Fragment {
     private MainViewModel viewModel;
     private SeekBar strokeWidthSeekBar;
     private ImageView ivPencil, ivEraser, ivUndo;
+    private RecyclerView rvDragCharacters;
+    private DrawingToolsFragInterface callbacks;
+
+    public interface DrawingToolsFragInterface
+    {
+        void undoLastAction();
+        void selectPencil();
+        void selectEraser();
+        void clearCanvas();
+    }
 
     public DrawingToolsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,11 +61,17 @@ public class DrawingToolsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        callbacks = (DrawingToolsFragInterface)requireActivity();
         strokeWidthSeekBar = requireActivity().findViewById(R.id.sbStrokeWidth);
         ivPencil = requireActivity().findViewById(R.id.btnPencil);
         ivEraser = requireActivity().findViewById(R.id.btnEraser);
         ivUndo = requireActivity().findViewById(R.id.btnUndo);
+        rvDragCharacters = requireActivity().findViewById(R.id.rvDragCharacters);
 
+        //Poner el color del botón que está elegido por defecto (lápiz)
+        ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
+
+        //Cambiar el progreso de la barra
         strokeWidthSeekBar.setProgress((int)(viewModel.getStrokeWidth().getValue() - ToolsConstants.MINIMUM_STROKE_WIDTH));
 
         strokeWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -75,6 +91,34 @@ public class DrawingToolsFragment extends Fragment {
             }
         });
 
+        ivUndo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callbacks.undoLastAction();
+                Utils.animateClick(v);
+            }
+        });
+
+        ivPencil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.animateClick(v);
+                ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
+                ivEraser.getBackground().clearColorFilter();
+                callbacks.selectPencil();
+            }
+        });
+
+        ivEraser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.animateClick(v);
+                ivPencil.getBackground().clearColorFilter();
+                ivEraser.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
+                callbacks.selectEraser();
+            }
+        });
+
         ivEraser.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -83,7 +127,7 @@ public class DrawingToolsFragment extends Fragment {
 
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        viewModel.getClearCanvas().setValue(true);
+                        callbacks.clearCanvas();
                     }
                 });
 
@@ -96,23 +140,5 @@ public class DrawingToolsFragment extends Fragment {
                 return true;
             }
         });
-
-        final Observer<Boolean> isPencilSelectedObserver = new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean isPencil) {
-                if(isPencil)
-                {
-                    ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
-                    ivEraser.getBackground().clearColorFilter();
-                }
-                else
-                {
-                    ivPencil.getBackground().clearColorFilter();
-                    ivEraser.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
-                }
-            }
-        };
-
-        viewModel.getIsPencilSelected().observe(getViewLifecycleOwner(), isPencilSelectedObserver);
     }
 }

@@ -22,14 +22,13 @@ import com.penwallet.roldechill.R;
  * A simple {@link Fragment} subclass.
  */
 public class DrawingFragment extends Fragment {
-    MainViewModel viewModel;
-    MyCanvas myCanvas;
-    RelativeLayout relativeLayout;
+    private MainViewModel viewModel;
+    private MyCanvas myCanvas;
+    private RelativeLayout relativeLayout;
 
     public DrawingFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,7 +44,7 @@ public class DrawingFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getIsPencilSelected().getValue(), viewModel.getDrawnPaths());
+        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getDrawnPaths());
 
         relativeLayout = requireActivity().findViewById(R.id.drawingLayout);
         relativeLayout.addView(myCanvas);
@@ -57,34 +56,7 @@ public class DrawingFragment extends Fragment {
             }
         };
 
-        final Observer<Boolean> isPencilObserver = new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean isPencil) {
-                if(isPencil)
-                    myCanvas.changeToPencil();
-                else
-                    myCanvas.changeToEraser();
-            }
-        };
-
-        final Observer<Boolean> clearCanvasObserver = new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean isPencil) {
-                myCanvas.clearCanvas();
-            }
-        };
-
-        final Observer<Boolean> undoLastAction = new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean undo) {
-                myCanvas.undoLast();
-            }
-        };
-
         viewModel.getStrokeWidth().observe(getViewLifecycleOwner(), strokeWidthObserver);
-        viewModel.getIsPencilSelected().observe(getViewLifecycleOwner(), isPencilObserver);
-        viewModel.getUndoLastAction().observe(getViewLifecycleOwner(), undoLastAction);
-        viewModel.getClearCanvas().observe(getViewLifecycleOwner(), clearCanvasObserver);
     }
 
     @Override
@@ -92,5 +64,25 @@ public class DrawingFragment extends Fragment {
         super.onPause();
 
         viewModel.setDrawnPaths(myCanvas.getPaths());
+    }
+
+    public void undoLastAction()
+    {
+        myCanvas.undoLast();
+    }
+
+    public void selectPencil()
+    {
+        myCanvas.changeToPencil();
+    }
+
+    public void selectEraser()
+    {
+        myCanvas.changeToEraser();
+    }
+
+    public void clearCanvas()
+    {
+        myCanvas.clearCanvas();
     }
 }

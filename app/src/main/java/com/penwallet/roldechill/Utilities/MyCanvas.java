@@ -25,12 +25,11 @@ public class MyCanvas extends View {
     private Paint paintInUse;
     boolean isPencil;
 
-    public MyCanvas(Context context, float width, boolean isPencil, ArrayList<Pair<Path, Paint>> paths) {
+    public MyCanvas(Context context, float width, ArrayList<Pair<Path, Paint>> paths) {
         super(context);
         this.width = width;
-        this.isPencil = isPencil;
-
         this.paths = paths;
+        isPencil = true;
     }
 
     @Override

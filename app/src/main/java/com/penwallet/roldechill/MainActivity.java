@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DrawingToolsFragment.DrawingToolsFragInterface {
 
     private MainViewModel viewModel;
     ListFragment listFragment;
@@ -150,21 +150,6 @@ public class MainActivity extends AppCompatActivity {
         toolsFrame.setLayoutParams(toolsFrameParams);
     }
 
-    public void choosePencil(View view) {
-        viewModel.getIsPencilSelected().setValue(true);
-        Utils.animateClick(view);
-    }
-
-    public void chooseEraser(View view) {
-        viewModel.getIsPencilSelected().setValue(false);
-        Utils.animateClick(view);
-    }
-
-    public void undoLastAction(View view) {
-        viewModel.getUndoLastAction().setValue(true);
-        Utils.animateClick(view);
-    }
-
     @Override
     public void onBackPressed() {
 
@@ -186,5 +171,25 @@ public class MainActivity extends AppCompatActivity {
             mainFrame.setLayoutParams(mainFrameParams);
             toolsFrame.setLayoutParams(toolsFrameParams);
         }
+    }
+
+    @Override
+    public void undoLastAction() {
+        drawingFragment.undoLastAction();
+    }
+
+    @Override
+    public void selectEraser() {
+        drawingFragment.selectEraser();
+    }
+
+    @Override
+    public void selectPencil() {
+        drawingFragment.selectPencil();
+    }
+
+    @Override
+    public void clearCanvas() {
+        drawingFragment.clearCanvas();
     }
 }
