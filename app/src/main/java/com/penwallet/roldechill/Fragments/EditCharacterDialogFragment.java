@@ -31,6 +31,12 @@ import java.util.Arrays;
 public class EditCharacterDialogFragment extends DialogFragment {
     private View view;
     private MainViewModel viewModel;
+    private int position;
+
+    public EditCharacterDialogFragment(int position)
+    {
+        this.position = position;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -55,7 +61,6 @@ public class EditCharacterDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         //Se vuelve a poner a null para solucionar bug:
                         //Si se ha elegido un personaje para Editar, se entra en dibujo, y se sale, se abría de nuevo la ventana de Editar
-                        viewModel.getSelectedCreature().setValue(null);
                         dialog.cancel();
                     }
                 })
@@ -75,10 +80,13 @@ public class EditCharacterDialogFragment extends DialogFragment {
         spinner.setAdapter(adapter);
 
         //Darle los valores que ya sabemos
-        Creature c = viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue());
+        Creature c = viewModel.getCreatures().getValue().get(position);
         ((EditText)view.findViewById(R.id.createNombre)).setText(c.getNombre());
         ((EditText)view.findViewById(R.id.createIniciativa)).setText(Integer.toString(c.getIniciativa()));
         ((Spinner)view.findViewById(R.id.createEstado)).setSelection(c.getEstado().ordinal());
+
+        //Esconder el selector de copias, porque estamos editando
+        view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.GONE);
 
         if(c instanceof Ally)
         {
@@ -89,7 +97,6 @@ public class EditCharacterDialogFragment extends DialogFragment {
             ((CheckBox)view.findViewById(R.id.createEsJugador)).setChecked(true);
 
             //Visibilidad de las vistas
-            view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.VISIBLE);
@@ -103,7 +110,6 @@ public class EditCharacterDialogFragment extends DialogFragment {
             ((CheckBox)view.findViewById(R.id.createEsJugador)).setChecked(false);
 
             //Visibilidad de las vistas
-            view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
             view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
             view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
@@ -115,7 +121,6 @@ public class EditCharacterDialogFragment extends DialogFragment {
                 //Si es un jugador, desaparece el botón de añadir copias,si no, vuelve a aparecer
                 if(isChecked)
                 {
-                    view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.GONE);
                     view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.GONE);
                     view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.VISIBLE);
@@ -123,7 +128,6 @@ public class EditCharacterDialogFragment extends DialogFragment {
                 }
                 else
                 {
-                    view.findViewById(R.id.createCopiasLinearLayout).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.create_character_popup_dano_recibido).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.create_character_popup_vida_actual).setVisibility(View.GONE);
                     view.findViewById(R.id.create_character_popup_vida_maxima).setVisibility(View.GONE);
@@ -226,7 +230,7 @@ public class EditCharacterDialogFragment extends DialogFragment {
 
                     if(okay)
                     {
-                        Creature creature = viewModel.getCreatures().getValue().get(viewModel.getSelectedCreature().getValue());
+                        Creature creature = viewModel.getCreatures().getValue().get(position);
 
                         //Ahora depende de si ha cambiado de Ally a Enemy; de Enemy a Ally, o si ha cambiado los datos de un Ally o de un Enemy
                         if(creature instanceof Ally)
@@ -243,7 +247,7 @@ public class EditCharacterDialogFragment extends DialogFragment {
                                 ally.setEstado(estado);
                             }
                             else //Si va a cambiar a ser un Enemy
-                                viewModel.getCreatures().getValue().set(viewModel.getSelectedCreature().getValue(), new Enemy(nombre, vidaActual, iniciativa, estado, ally.getPifias()));
+                                viewModel.getCreatures().getValue().set(position, new Enemy(nombre, vidaActual, iniciativa, estado, ally.getPifias()));
                         }
                         else
                         {
@@ -258,7 +262,7 @@ public class EditCharacterDialogFragment extends DialogFragment {
                                 enemy.setEstado(estado);
                             }
                             else //Si va a cambiar a ser un Ally
-                                viewModel.getCreatures().getValue().set(viewModel.getSelectedCreature().getValue(), new Ally(nombre, vidaActual, vidaMaxima, iniciativa, estado, enemy.getPifias()));
+                                viewModel.getCreatures().getValue().set(position, new Ally(nombre, vidaActual, vidaMaxima, iniciativa, estado, enemy.getPifias()));
                         }
 
                         //Refrescar la lista al terminar de actualizar los datos de la criatura

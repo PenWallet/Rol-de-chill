@@ -78,19 +78,6 @@ public class ListFragment extends Fragment {
         listView.setCanDragHorizontally(false);
         listView.setCustomDragItem(null);
 
-        //Observer para la posición elegida para abrir el popup de editar
-        final Observer<Integer> selectedCreatureObserver = new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if(integer != null)
-                {
-                    DialogFragment popup = new EditCharacterDialogFragment();
-                    popup.setCancelable(false);
-                    popup.show(((AppCompatActivity)requireContext()).getSupportFragmentManager(), "popupEdit");
-                }
-            }
-        };
-
         //Observer para refrescar la lista
         final Observer<Boolean> refreshList = new Observer<Boolean>() {
             @Override
@@ -99,7 +86,12 @@ public class ListFragment extends Fragment {
             }
         };
 
-        viewModel.getSelectedCreature().observe(getViewLifecycleOwner(), selectedCreatureObserver);
         viewModel.getPerformListRefresh().observe(getViewLifecycleOwner(), refreshList);
+    }
+
+    public void abrirEditar(int position)
+    {
+        DialogFragment popup = new EditCharacterDialogFragment(position);
+        popup.show(((AppCompatActivity)requireContext()).getSupportFragmentManager(), "popupEdit");
     }
 }

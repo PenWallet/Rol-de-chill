@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -18,9 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
-import com.penwallet.roldechill.Constants.ToolsConstants;
+import com.penwallet.roldechill.Adapters.DrawingImagesListAdapter;
+import com.penwallet.roldechill.Constants.Constants;
 import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
 import com.penwallet.roldechill.Utilities.Utils;
@@ -34,8 +34,9 @@ public class DrawingToolsFragment extends Fragment {
     private MainViewModel viewModel;
     private SeekBar strokeWidthSeekBar;
     private ImageView ivPencil, ivEraser, ivUndo;
-    private RecyclerView rvDragCharacters;
     private DrawingToolsFragInterface callbacks;
+    private RecyclerView rvDragCharacters;
+    private DrawingImagesListAdapter rvdcAdapter;
 
     public interface DrawingToolsFragInterface
     {
@@ -68,16 +69,22 @@ public class DrawingToolsFragment extends Fragment {
         ivUndo = requireActivity().findViewById(R.id.btnUndo);
         rvDragCharacters = requireActivity().findViewById(R.id.rvDragCharacters);
 
+        //Preparar el listado de caracteres
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvdcAdapter = new DrawingImagesListAdapter(viewModel.getCreatures().getValue());
+        rvDragCharacters.setLayoutManager(linearLayoutManager);
+        rvDragCharacters.setAdapter(rvdcAdapter);
+
         //Poner el color del botón que está elegido por defecto (lápiz)
         ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
 
         //Cambiar el progreso de la barra
-        strokeWidthSeekBar.setProgress((int)(viewModel.getStrokeWidth().getValue() - ToolsConstants.MINIMUM_STROKE_WIDTH));
+        strokeWidthSeekBar.setProgress((int)(viewModel.getStrokeWidth().getValue() - Constants.MINIMUM_STROKE_WIDTH));
 
         strokeWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                viewModel.getStrokeWidth().setValue(ToolsConstants.MINIMUM_STROKE_WIDTH + progress*2);
+                viewModel.getStrokeWidth().setValue(Constants.MINIMUM_STROKE_WIDTH + progress*2);
             }
 
             @Override
@@ -140,5 +147,10 @@ public class DrawingToolsFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    public void refreshList()
+    {
+        rvdcAdapter.notifyDataSetChanged();
     }
 }

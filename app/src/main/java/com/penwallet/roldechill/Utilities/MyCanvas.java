@@ -5,18 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.Nullable;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class MyCanvas extends View {
     float width;
@@ -115,4 +108,5 @@ public class MyCanvas extends View {
     public ArrayList<Pair<Path, Paint>> getPaths() {
         return paths;
     }
+
 }

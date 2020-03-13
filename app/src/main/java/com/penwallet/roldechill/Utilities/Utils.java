@@ -6,6 +6,10 @@ import android.view.animation.CycleInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 
+import com.penwallet.roldechill.Entities.Ally;
+import com.penwallet.roldechill.Entities.Creature;
+import com.penwallet.roldechill.R;
+
 public class Utils {
     public static void animateClick(View v)
     {
@@ -23,5 +27,34 @@ public class Utils {
         animation.setDuration(200);
 
         v.startAnimation(animation);
+    }
+
+    public static int getCreatureImageId(Creature creature)
+    {
+        if(creature instanceof Ally)
+        {
+            String nombre = creature.getNombre().toLowerCase();
+            switch (nombre)
+            {
+                case "oscar":
+                    return R.drawable.oscar;
+                case "miguel":
+                    return R.drawable.miguel;
+                case "fran":
+                    return R.drawable.fran;
+                case "olga":
+                    return R.drawable.olga;
+                case "triana":
+                    return R.drawable.triana;
+                case "jose":
+                case "negro":
+                    return R.drawable.joseniggar;
+                default:
+                    return R.drawable.player;
+
+            }
+        }
+        else
+            return R.drawable.enemy;
     }
 }

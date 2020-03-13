@@ -38,6 +38,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
     private boolean mDragOnLongPress;
     private Context context;
     private MainViewModel viewModel;
+    private CreaturesListAdapterInterface callbacks;
 
     public CreaturesListAdapter(ArrayList<Creature> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context, MainViewModel mainViewModel) {
         mLayoutId = layoutId;
@@ -45,7 +46,13 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         mDragOnLongPress = dragOnLongPress;
         this.context = context;
         this.viewModel = mainViewModel;
+        callbacks = (CreaturesListAdapterInterface)context;
         setItemList(list);
+    }
+
+    public interface CreaturesListAdapterInterface
+    {
+        void abrirEditar(int position);
     }
 
     @NonNull
@@ -68,20 +75,6 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             holder.health.setText(Integer.toString(ally.getVidaActual()));
             holder.maxHealth.setText(Integer.toString(ally.getVidaMaxima()));
 
-            //En caso de ser uno de nosotros, cambiar la imagen
-            if(mItemList.get(position).getNombre().toLowerCase().equals("oscar"))
-                holder.image.setImageResource(R.drawable.oscar);
-            else if(mItemList.get(position).getNombre().toLowerCase().equals("miguel"))
-                holder.image.setImageResource(R.drawable.miguel);
-            else if(mItemList.get(position).getNombre().toLowerCase().equals("fran"))
-                holder.image.setImageResource(R.drawable.fran);
-            else if(mItemList.get(position).getNombre().toLowerCase().equals("olga"))
-                holder.image.setImageResource(R.drawable.olga);
-            else if(mItemList.get(position).getNombre().toLowerCase().equals("triana"))
-                holder.image.setImageResource(R.drawable.triana);
-            else
-                holder.image.setImageResource(R.drawable.player);
-
             //Si es un aliado, la vida actual y máxima vuelven a las posiciones iniciales y vuelven a ser visibles
             holder.slash.setVisibility(View.VISIBLE);
             holder.maxHealth.setVisibility(View.VISIBLE);
@@ -97,9 +90,6 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             //La "vida" se cambia al daño recibido del eneimgo
             holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
 
-            //La imagen se cambia a la de una criatura
-            holder.image.setImageResource(R.drawable.creature);
-
             //Si es un enemigo, el daño recibido queda centrado bajo la imagen
             holder.slash.setVisibility(View.GONE);
             holder.maxHealth.setVisibility(View.GONE);
@@ -112,6 +102,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         holder.iniciativa.setText(Integer.toString(mItemList.get(position).getIniciativa()));
         holder.name.setText(mItemList.get(position).getNombre());
         holder.pifias.setText(Integer.toString(mItemList.get(position).getPifias()));
+        holder.image.setImageResource(Utils.getCreatureImageId(mItemList.get(position)));
 
         //Cargar el Spinner
         String[] estados = Arrays.toString(Status.values()).replaceAll("^.|.$", "").split(", ");
@@ -141,10 +132,17 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
                 {
                     Enemy enemy = (Enemy)mItemList.get(position);
 
-                    Utils.animateClick(v);
-                    enemy.cambiarDanoRecibido(1);
+                    if(enemy.getDanoRecibido() >= 9999)
+                    {
+                        Utils.animateError(v);
+                    }
+                    else
+                    {
+                        Utils.animateClick(v);
+                        enemy.cambiarDanoRecibido(1);
 
-                    holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
+                        holder.health.setText(Integer.toString(enemy.getDanoRecibido()));
+                    }
                 }
             }
         }));
@@ -232,7 +230,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         holder.whole.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.getSelectedCreature().setValue(position);
+                callbacks.abrirEditar(position);
             }
         });
 

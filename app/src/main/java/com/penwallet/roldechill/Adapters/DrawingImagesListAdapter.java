@@ -1,55 +1,91 @@
 package com.penwallet.roldechill.Adapters;
 
-import android.content.Context;
+import android.content.ClipData;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.penwallet.roldechill.Entities.Creature;
-import com.penwallet.roldechill.Entities.Status;
-import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
 import com.penwallet.roldechill.Utilities.Utils;
-import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class DrawingImagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class DrawingImagesListAdapter extends RecyclerView.Adapter<DrawingImagesListAdapter.ViewHolder> {
 
     private ArrayList<Creature> creatures;
-    private Context context;
-    private MainViewModel viewModel;
 
-    public DrawingImagesListAdapter(ArrayList<Creature> creatures, Context context, MainViewModel mainViewModel) {
+    public DrawingImagesListAdapter(ArrayList<Creature> creatures) {
         this.creatures = creatures;
-        this.context = context;
-        this.viewModel = mainViewModel;
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        TextView name;
+        ImageView image;
+        View view;
+
+        public ViewHolder(View view) {
+            super(view);
+            this.view = view;
+            this.name = view.findViewById(R.id.txtNameDrag);
+            this.image = view.findViewById(R.id.imgCharacterDrag);
+        }
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawing_drag_character, parent, false);
+        ViewHolder vh = new ViewHolder(view);
+        return vh;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        final Creature creature = creatures.get(position);
 
+        holder.name.setText(creature.getNombre());
+        holder.image.setImageResource(Utils.getCreatureImageId(creature));
+        holder.view.setTag(creature);
+
+        if(creature.isColocadaEnCanvas())
+        {
+            ColorMatrix cm = new ColorMatrix();
+            cm.setSaturation(0);
+            holder.image.setColorFilter(new ColorMatrixColorFilter(cm));
+        }
+        else
+        {
+            holder.image.clearColorFilter();
+        }
+
+        //Permitir a la vista ser arrastrada
+        holder.view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                //Solo permitimos que coloque a la criatura en el canvas si no ha sido colocada aún
+                if(!creature.isColocadaEnCanvas())
+                {
+                    ClipData data = ClipData.newPlainText("", "");
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
+                            view);
+                    view.startDragAndDrop(data, shadowBuilder, view, View.DRAG_FLAG_OPAQUE);
+
+                    creature.setColocadaEnCanvas(true);
+                    ColorMatrix cm = new ColorMatrix();
+                    cm.setSaturation(0);
+                    holder.image.setColorFilter(new ColorMatrixColorFilter(cm));
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -62,58 +98,9 @@ public class DrawingImagesListAdapter extends RecyclerView.Adapter<RecyclerView.
         return creatures.size();
     }
 
-    /*@Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if(convertView == null)
-        {
-            convertView = LayoutInflater.from(context).inflate(R.layout.drawing_drag_character, parent, false);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
+    public void creatureRemovedFromCanvas(Creature creature)
+    {
 
-        }
-        else
-        {
-            holder = (ViewHolder)convertView.getTag();
-        }
-
-        Creature creature = creatures.get(position);
-
-        //Darle foto a la imagen
-        if(creature.isEsJugador())
-        {
-            if(creature.getNombre().toLowerCase().equals("oscar"))
-                holder.image.setImageResource(R.drawable.oscar);
-            else if(creature.getNombre().toLowerCase().equals("miguel"))
-                holder.image.setImageResource(R.drawable.miguel);
-            else if(creature.getNombre().toLowerCase().equals("fran"))
-                holder.image.setImageResource(R.drawable.fran);
-            else if(creature.getNombre().toLowerCase().equals("olga"))
-                holder.image.setImageResource(R.drawable.olga);
-            else if(creature.getNombre().toLowerCase().equals("triana"))
-                holder.image.setImageResource(R.drawable.triana);
-            else
-                holder.image.setImageResource(R.drawable.player);
-        }
-        else
-            holder.image.setImageResource(R.drawable.creature);
-
-        holder.name.setText(creature.getNombre());
-
-        return convertView;
     }
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
-        CardView whole;
-        ImageView image;
-
-        public ViewHolder(View view) {
-            super(view);
-            whole = view.findViewById(R.id.cardViewDrawingDragCharacter);
-            name = view.findViewById(R.id.txtNameDrag);
-            image = view.findViewById(R.id.imgCharacterDrag);
-        }
-    }*/
 
 }

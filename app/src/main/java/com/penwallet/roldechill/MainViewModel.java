@@ -7,15 +7,13 @@ import android.util.Pair;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.penwallet.roldechill.Constants.ToolsConstants;
+import com.penwallet.roldechill.Constants.Constants;
 import com.penwallet.roldechill.Entities.Creature;
-import com.woxthebox.draglistview.DragListView;
 
 import java.util.ArrayList;
 
 public class MainViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Creature>> creatures;
-    private MutableLiveData<Integer> selectedCreature;
     private MutableLiveData<Boolean> performListRefresh; //Used only to observe and refresh the list
     private ArrayList<Pair<Path, Paint>> drawnPaths;
 
@@ -25,21 +23,16 @@ public class MainViewModel extends ViewModel {
     public MainViewModel()
     {
         creatures = new MutableLiveData<>();
-        selectedCreature = new MutableLiveData<>();
         performListRefresh = new MutableLiveData<>();
         drawnPaths = new ArrayList<>();
 
-        strokeWidth = new MutableLiveData<>(); strokeWidth.setValue(ToolsConstants.MINIMUM_STROKE_WIDTH);
+        strokeWidth = new MutableLiveData<>(); strokeWidth.setValue(Constants.MINIMUM_STROKE_WIDTH);
 
         creatures.setValue(new ArrayList<Creature>());
     }
 
     public MutableLiveData<ArrayList<Creature>> getCreatures() {
         return creatures;
-    }
-
-    public MutableLiveData<Integer> getSelectedCreature() {
-        return selectedCreature;
     }
 
     public MutableLiveData<Boolean> getPerformListRefresh() {

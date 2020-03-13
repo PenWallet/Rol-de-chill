@@ -8,6 +8,8 @@ public class Creature {
     private int iniciativa, id; //La vida servirá como daño recibido si es un bicho
     private Status estado;
     private int pifias;
+    private boolean colocadaEnCanvas; //Boolean usado para saber si esta criatura se ha colocado en el canvas
+    private float canvasX, canvasY;
 
     @SerializedName("type")
     private String typeName;
@@ -20,6 +22,9 @@ public class Creature {
         this.estado = Status.NORMAL;
         this.pifias = 0;
         this.typeName = getClass().getName();
+        this.colocadaEnCanvas = false;
+        this.canvasX = 0;
+        this.canvasY = 0;
     }
 
     public Creature(String nombre, int iniciativa, Status estado, int pifias)
@@ -30,6 +35,9 @@ public class Creature {
         this.estado = estado;
         this.pifias = pifias;
         this.typeName = getClass().getName();
+        this.colocadaEnCanvas = false;
+        this.canvasX = 0;
+        this.canvasY = 0;
     }
 
     public int getId() {
@@ -71,5 +79,29 @@ public class Creature {
     public void cambiarPifia(int pifiaASumarORestar)
     {
         this.pifias += pifiaASumarORestar;
+    }
+
+    public boolean isColocadaEnCanvas() {
+        return colocadaEnCanvas;
+    }
+
+    public void setColocadaEnCanvas(boolean colocadaEnCanvas) {
+        this.colocadaEnCanvas = colocadaEnCanvas;
+    }
+
+    public float getCanvasX() {
+        return canvasX;
+    }
+
+    public void setCanvasX(float canvasX) {
+        this.canvasX = canvasX;
+    }
+
+    public float getCanvasY() {
+        return canvasY;
+    }
+
+    public void setCanvasY(float canvasY) {
+        this.canvasY = canvasY;
     }
 }

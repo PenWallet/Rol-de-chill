@@ -16,7 +16,8 @@ import android.widget.LinearLayout;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.penwallet.roldechill.Constants.SharedPreferencesConstants;
+import com.penwallet.roldechill.Adapters.CreaturesListAdapter;
+import com.penwallet.roldechill.Constants.Constants;
 import com.penwallet.roldechill.Entities.Ally;
 import com.penwallet.roldechill.Entities.Creature;
 import com.penwallet.roldechill.Entities.Status;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class MainActivity extends AppCompatActivity implements DrawingToolsFragment.DrawingToolsFragInterface {
+public class MainActivity extends AppCompatActivity implements DrawingToolsFragment.DrawingToolsFragInterface, DrawingFragment.DrawingFragInterface, CreaturesListAdapter.CreaturesListAdapterInterface {
 
     private MainViewModel viewModel;
     ListFragment listFragment;
@@ -48,37 +49,30 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         //Cogemos los datos del SharedPreferences si existen
-        SharedPreferences preferences = this.getSharedPreferences(SharedPreferencesConstants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
-        String creaturesJson = preferences.getString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, null);
+        SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
+        String creaturesJson = preferences.getString(Constants.SHAREDPREFERENCES_CREATURES_NAME, null);
         if(creaturesJson != null)
         {
-            Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
-            Type type = new TypeToken<ArrayList<Creature>>(){}.getType();
-
-            ArrayList<Creature> creaturesList = gson.fromJson(creaturesJson, type);
-
-            //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto
-            if(creaturesList.size() == 0)
+            //Try catch por si acaso se tienen datos antiguos. Cuando todos hayan instalado la nueva versión, TODO: Borrar try catch
+            try
             {
-                //Metemos a Miguel, Olga y a mi por defecto
-                viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
-                viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
+                Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
+                Type type = new TypeToken<ArrayList<Creature>>(){}.getType();
+
+                ArrayList<Creature> creaturesList = gson.fromJson(creaturesJson, type);
+
+                //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto (y si acaso al negro)
+                if(creaturesList.size() == 0)
+                    meterALosMismosDeSiempre();
+                else
+                    viewModel.getCreatures().setValue(creaturesList);
+            }catch(Exception e){
+                meterALosMismosDeSiempre();
             }
-            else
-                viewModel.getCreatures().setValue(creaturesList);
+
         }
         else
-        {
-            //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto
-            viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
-            viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
-        }
+            meterALosMismosDeSiempre();
 
         listFragment = new ListFragment();
         drawingFragment = new DrawingFragment();
@@ -95,11 +89,11 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         super.onStop();
 
         //Guardar a SharedPreferences
-        SharedPreferences preferences = this.getSharedPreferences(SharedPreferencesConstants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
         Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
         String json = gson.toJson(viewModel.getCreatures().getValue());
-        prefsEditor.putString(SharedPreferencesConstants.CREATURES_SHAREDPREFERENCES_NAME, json);
+        prefsEditor.putString(Constants.SHAREDPREFERENCES_CREATURES_NAME, json);
         prefsEditor.apply();
     }
 
@@ -143,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         LinearLayout.LayoutParams toolsFrameParams = (LinearLayout.LayoutParams)toolsFrame.getLayoutParams();
         LinearLayout.LayoutParams mainFrameParams = (LinearLayout.LayoutParams)mainFrame.getLayoutParams();
 
-        toolsFrameParams.weight = 1.3f;
-        mainFrameParams.weight = 8.7f;
+        toolsFrameParams.weight = Constants.TOOLSFRAME_WEIGHT;
+        mainFrameParams.weight = Constants.MAINFRAME_WEIGHT;
 
         mainFrame.setLayoutParams(mainFrameParams);
         toolsFrame.setLayoutParams(toolsFrameParams);
@@ -191,5 +185,26 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
     @Override
     public void clearCanvas() {
         drawingFragment.clearCanvas();
+    }
+
+    @Override
+    public void refreshDraggingList() {
+        drawingToolsFragment.refreshList();
+    }
+
+    @Override
+    public void abrirEditar(int position) {
+        listFragment.abrirEditar(position);
+    }
+
+    private void meterALosMismosDeSiempre()
+    {
+        //Metemos a los 5 tontos de siempre por defecto (y si acaso al negro)
+        viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Jose", 1, 1, 0, Status.NORMAL, 0));
     }
 }
