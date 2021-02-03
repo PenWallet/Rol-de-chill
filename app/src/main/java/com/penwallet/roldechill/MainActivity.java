@@ -8,10 +8,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,6 +31,7 @@ import com.penwallet.roldechill.Fragments.DrawingFragment;
 import com.penwallet.roldechill.Fragments.DrawingToolsFragment;
 import com.penwallet.roldechill.Fragments.ListFragment;
 import com.penwallet.roldechill.Utilities.JsonDeserializerWithInheritance;
+import com.penwallet.roldechill.Utilities.MyCanvas;
 import com.penwallet.roldechill.Utilities.Utils;
 
 import java.lang.reflect.Type;
@@ -50,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
 
         //Cogemos los datos del SharedPreferences si existen
         SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
+
+        viewModel.setPencilColor(preferences.getInt(Constants.SHAREDPREFERENCES_CHOSEN_PENCIL_COLOR, Color.BLACK));
+
         String creaturesJson = preferences.getString(Constants.SHAREDPREFERENCES_CREATURES_NAME, null);
         if(creaturesJson != null)
         {
@@ -62,10 +71,11 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
                 ArrayList<Creature> creaturesList = gson.fromJson(creaturesJson, type);
 
                 //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto (y si acaso al negro)
-                if(creaturesList.size() == 0)
-                    meterALosMismosDeSiempre();
-                else
+                if(creaturesList.isEmpty())
                     viewModel.getCreatures().setValue(creaturesList);
+                else
+                    meterALosMismosDeSiempre();
+
             }catch(Exception e){
                 meterALosMismosDeSiempre();
             }
@@ -73,6 +83,22 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         }
         else
             meterALosMismosDeSiempre();
+
+        String jsonPaths = preferences.getString(Constants.SHAREDPREFERENCES_PATHS, null);
+        if(jsonPaths != null)
+        {
+            Gson gsonPaths = new GsonBuilder().create();
+            Type type = new TypeToken<ArrayList<Pair<Path, Paint>>>(){}.getType();
+
+            ArrayList<Pair<Path, Paint>> paths = gsonPaths.fromJson(jsonPaths, type);
+
+            if(paths.isEmpty())
+                viewModel.setDrawnPaths(new ArrayList<Pair<Path, Paint>>());
+            else
+                viewModel.setDrawnPaths(paths);
+        }
+        else
+            viewModel.setDrawnPaths(new ArrayList<Pair<Path, Paint>>());
 
         listFragment = new ListFragment();
         drawingFragment = new DrawingFragment();
@@ -91,9 +117,16 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         //Guardar a SharedPreferences
         SharedPreferences preferences = this.getSharedPreferences(Constants.SHAREDPREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = preferences.edit();
-        Gson gson = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
-        String json = gson.toJson(viewModel.getCreatures().getValue());
-        prefsEditor.putString(Constants.SHAREDPREFERENCES_CREATURES_NAME, json);
+
+        Gson gsonCreatures = new GsonBuilder().registerTypeAdapter(Creature.class, new JsonDeserializerWithInheritance<Creature>()).create();
+        String jsonCreatures = gsonCreatures.toJson(viewModel.getCreatures().getValue());
+
+        Gson gsonPaths = new Gson();
+        String jsonPaths = gsonPaths.toJson(viewModel.getDrawnPaths());
+
+        prefsEditor.putString(Constants.SHAREDPREFERENCES_CREATURES_NAME, jsonCreatures);
+        prefsEditor.putString(Constants.SHAREDPREFERENCES_PATHS, jsonPaths);
+        prefsEditor.putInt(Constants.SHAREDPREFERENCES_CHOSEN_PENCIL_COLOR, viewModel.getPencilColor());
         prefsEditor.apply();
     }
 
@@ -197,14 +230,20 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
         listFragment.abrirEditar(position);
     }
 
+    @Override
+    public void changeColorPencil(int color) {
+        drawingFragment.changePencilColor(color);
+        viewModel.setPencilColor(color);
+    }
+
     private void meterALosMismosDeSiempre()
     {
         //Metemos a los 5 tontos de siempre por defecto (y si acaso al negro)
-        viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
+        /*viewModel.getCreatures().getValue().add(new Ally("Oscar", 1, 1, 0, Status.NORMAL, 0));
         viewModel.getCreatures().getValue().add(new Ally("Miguel", 1, 1, 0, Status.NORMAL, 0));
         viewModel.getCreatures().getValue().add(new Ally("Olga", 1, 1, 0, Status.NORMAL, 0));
         viewModel.getCreatures().getValue().add(new Ally("Fran", 1, 1, 0, Status.NORMAL, 0));
         viewModel.getCreatures().getValue().add(new Ally("Triana", 1, 1, 0, Status.NORMAL, 0));
-        viewModel.getCreatures().getValue().add(new Ally("Jose", 1, 1, 0, Status.NORMAL, 0));
+        viewModel.getCreatures().getValue().add(new Ally("Jose", 1, 1, 0, Status.NORMAL, 0));*/
     }
 }

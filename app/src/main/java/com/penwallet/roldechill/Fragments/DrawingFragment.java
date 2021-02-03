@@ -60,7 +60,7 @@ public class DrawingFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         callbacks = (DrawingFragInterface)requireActivity();
 
-        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getDrawnPaths());
+        myCanvas = new MyCanvas(requireContext(), viewModel.getStrokeWidth().getValue(), viewModel.getDrawnPaths(), viewModel.getPencilColor());
 
         relativeLayout = requireActivity().findViewById(R.id.drawingLayout);
         relativeLayout.addView(myCanvas);
@@ -211,5 +211,10 @@ public class DrawingFragment extends Fragment {
 
         callbacks.refreshDraggingList();
         myCanvas.clearCanvas();
+    }
+
+    public void changePencilColor(int color)
+    {
+        myCanvas.changePencilColor(color);
     }
 }

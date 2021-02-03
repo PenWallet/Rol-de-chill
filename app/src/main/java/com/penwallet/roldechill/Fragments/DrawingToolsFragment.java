@@ -18,12 +18,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.penwallet.roldechill.Adapters.DrawingImagesListAdapter;
 import com.penwallet.roldechill.Constants.Constants;
 import com.penwallet.roldechill.MainViewModel;
 import com.penwallet.roldechill.R;
 import com.penwallet.roldechill.Utilities.Utils;
+import com.skydoves.colorpickerview.ColorEnvelope;
+import com.skydoves.colorpickerview.ColorPickerDialog;
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
 
 /**
@@ -44,6 +48,7 @@ public class DrawingToolsFragment extends Fragment {
         void selectPencil();
         void selectEraser();
         void clearCanvas();
+        void changeColorPencil(int color);
     }
 
     public DrawingToolsFragment() {
@@ -77,6 +82,7 @@ public class DrawingToolsFragment extends Fragment {
 
         //Poner el color del botón que está elegido por defecto (lápiz)
         ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
+        ivPencil.setColorFilter(viewModel.getPencilColor());
 
         //Cambiar el progreso de la barra
         strokeWidthSeekBar.setProgress((int)(viewModel.getStrokeWidth().getValue() - Constants.MINIMUM_STROKE_WIDTH));
@@ -113,6 +119,36 @@ public class DrawingToolsFragment extends Fragment {
                 ivPencil.getBackground().setColorFilter(ContextCompat.getColor(requireContext(), R.color.violet), PorterDuff.Mode.LIGHTEN);
                 ivEraser.getBackground().clearColorFilter();
                 callbacks.selectPencil();
+            }
+        });
+
+        ivPencil.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Utils.animateClick(v);
+
+                new ColorPickerDialog.Builder(requireContext())
+                        .setTitle("Elige color de lápiz")
+                        .setPreferenceName("PencilColorDialog")
+                        .setPositiveButton("Okay",
+                                new ColorEnvelopeListener() {
+                                    @Override
+                                    public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
+                                        callbacks.changeColorPencil(envelope.getColor());
+                                        ivPencil.setColorFilter(envelope.getColor());
+                                    }
+                                })
+                        .setNegativeButton("Nein!",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                })
+                        .attachAlphaSlideBar(false)
+                        .attachBrightnessSlideBar(true)
+                        .show();
+                return true;
             }
         });
 

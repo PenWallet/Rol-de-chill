@@ -17,12 +17,14 @@ public class MyCanvas extends View {
     private Path pathInUse;
     private Paint paintInUse;
     boolean isPencil;
+    private int colorPencil;
 
-    public MyCanvas(Context context, float width, ArrayList<Pair<Path, Paint>> paths) {
+    public MyCanvas(Context context, float width, ArrayList<Pair<Path, Paint>> paths, int colorPencil) {
         super(context);
         this.width = width;
         this.paths = paths;
-        isPencil = true;
+        this.isPencil = true;
+        this.colorPencil = colorPencil;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class MyCanvas extends View {
 
                 paintInUse = new Paint();
                 paintInUse.setAntiAlias(true);
-                paintInUse.setColor(isPencil ? Color.BLACK : Color.WHITE);
+                paintInUse.setColor(isPencil ? colorPencil : Color.WHITE);
                 paintInUse.setStrokeJoin(Paint.Join.ROUND);
                 paintInUse.setStyle(Paint.Style.STROKE);
                 paintInUse.setStrokeWidth(isPencil ? width : width*2);
@@ -103,6 +105,11 @@ public class MyCanvas extends View {
     {
         paths.clear();
         invalidate();
+    }
+
+    public void changePencilColor(int color)
+    {
+        this.colorPencil = color;
     }
 
     public ArrayList<Pair<Path, Paint>> getPaths() {

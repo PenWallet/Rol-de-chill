@@ -112,7 +112,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
         holder.spinner.setSelection(mItemList.get(position).getEstado().ordinal());
 
 
-        holder.addHealth.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
+        holder.addHealth.setOnTouchListener(new RepeatListener(400, 100, 60, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mItemList.get(position) instanceof Ally)
@@ -147,7 +147,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             }
         }));
 
-        holder.subtractHealth.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
+        holder.subtractHealth.setOnTouchListener(new RepeatListener(400, 100,60, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -180,7 +180,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             }
         }));
 
-        holder.addPifia.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
+        holder.addPifia.setOnTouchListener(new RepeatListener(400, 100,60, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mItemList.get(position).getPifias() >= 99)
@@ -198,7 +198,7 @@ public class CreaturesListAdapter extends DragItemAdapter<Creature, CreaturesLis
             }
         }));
 
-        holder.subtractPifia.setOnTouchListener(new RepeatListener(400, 100, new View.OnClickListener() {
+        holder.subtractPifia.setOnTouchListener(new RepeatListener(400, 100,60, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

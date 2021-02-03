@@ -1,5 +1,6 @@
 package com.penwallet.roldechill;
 
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.Pair;
@@ -16,6 +17,7 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Creature>> creatures;
     private MutableLiveData<Boolean> performListRefresh; //Used only to observe and refresh the list
     private ArrayList<Pair<Path, Paint>> drawnPaths;
+    private int pencilColor;
 
     //Atributos para drawing
     private MutableLiveData<Float> strokeWidth;
@@ -25,6 +27,7 @@ public class MainViewModel extends ViewModel {
         creatures = new MutableLiveData<>();
         performListRefresh = new MutableLiveData<>();
         drawnPaths = new ArrayList<>();
+        pencilColor = Color.BLACK;
 
         strokeWidth = new MutableLiveData<>(); strokeWidth.setValue(Constants.MINIMUM_STROKE_WIDTH);
 
@@ -49,5 +52,13 @@ public class MainViewModel extends ViewModel {
 
     public void setDrawnPaths(ArrayList<Pair<Path, Paint>> drawnPaths) {
         this.drawnPaths = drawnPaths;
+    }
+
+    public int getPencilColor() {
+        return pencilColor;
+    }
+
+    public void setPencilColor(int pencilColor) {
+        this.pencilColor = pencilColor;
     }
 }

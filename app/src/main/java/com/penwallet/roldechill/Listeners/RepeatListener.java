@@ -22,15 +22,18 @@ public class RepeatListener implements OnTouchListener {
 
     private int initialInterval;
     private final int normalInterval;
+    private final int fasterInterval;
     private final OnClickListener clickListener;
     private View touchedView;
+    private static int counterTimes = 0;
 
     private Runnable handlerRunnable = new Runnable() {
         @Override
         public void run() {
             if(touchedView.isEnabled()) {
-                handler.postDelayed(this, normalInterval);
+                handler.postDelayed(this, counterTimes < 15 ? normalInterval : fasterInterval);
                 clickListener.onClick(touchedView);
+                counterTimes++;
             } else {
                 // if the view was disabled by the clickListener, remove the callback
                 handler.removeCallbacks(handlerRunnable);
@@ -47,7 +50,7 @@ public class RepeatListener implements OnTouchListener {
      * @param clickListener The OnClickListener, that will be called
      *       periodically
      */
-    public RepeatListener(int initialInterval, int normalInterval,
+    public RepeatListener(int initialInterval, int normalInterval, int fasterInterval,
                           OnClickListener clickListener) {
         if (clickListener == null)
             throw new IllegalArgumentException("null runnable");
@@ -56,6 +59,7 @@ public class RepeatListener implements OnTouchListener {
 
         this.initialInterval = initialInterval;
         this.normalInterval = normalInterval;
+        this.fasterInterval = fasterInterval;
         this.clickListener = clickListener;
     }
 
