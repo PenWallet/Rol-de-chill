@@ -72,9 +72,9 @@ public class MainActivity extends AppCompatActivity implements DrawingToolsFragm
 
                 //Si no hay ninguna criatura, metemos a los 5 tontos de siempre por defecto (y si acaso al negro)
                 if(creaturesList.isEmpty())
-                    viewModel.getCreatures().setValue(creaturesList);
-                else
                     meterALosMismosDeSiempre();
+                else
+                    viewModel.getCreatures().setValue(creaturesList);
 
             }catch(Exception e){
                 meterALosMismosDeSiempre();

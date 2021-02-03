@@ -33,8 +33,7 @@ public class Utils {
     {
         if(creature instanceof Ally)
         {
-            return R.drawable.player;
-            /*String nombre = creature.getNombre().toLowerCase();
+            String nombre = creature.getNombre().toLowerCase();
             switch (nombre)
             {
                 case "oscar":
@@ -53,7 +52,7 @@ public class Utils {
                 default:
                     return R.drawable.player;
 
-            }*/
+            }
         }
         else
             return R.drawable.enemy;
